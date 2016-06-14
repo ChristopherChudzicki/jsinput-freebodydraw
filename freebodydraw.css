@@ -1,0 +1,85 @@
+body {
+    box-sizing: border-box;
+    font-family: Arial,sans-serif;
+    margin: 10px;
+}
+
+
+.jxgboard {
+    float: left;
+    border: 2px solid #1f628d;
+}
+
+.jxgboard .JXGtext {
+    pointer-events: none;  /* prevents cursor from turning into caret when over a label */
+}
+
+.menu {
+    float: left;
+    width: 160px;
+    margin-left: 15px;
+}
+
+.menu .controls {
+    margin-bottom: 20px;
+    font-size: 12;
+}
+
+.menu .controls select {
+    width: 80px;
+    margin-bottom: 8px;
+    font-size: 18px;
+}
+
+.menu .controls button {
+    display: inline-block;
+    background-color: #3498db;
+    border-radius: 5px;
+    box-shadow: 0 1px 3px #666;
+    color: #fff;
+    font-size: 14px;
+    padding: 5px 10px 5px 10px;
+    margin: 4px 0;
+    border: 2px solid #1f628d;
+    text-decoration: none;
+    width: 160px;
+}
+
+.menu .controls button:hover {
+    background: #3cb0fd;
+    background-image: -webkit-linear-gradient(top, #3cb0fd, #3498db);
+    background-image: -moz-linear-gradient(top, #3cb0fd, #3498db);
+    background-image: -ms-linear-gradient(top, #3cb0fd, #3498db);
+    background-image: -o-linear-gradient(top, #3cb0fd, #3498db);
+    background-image: linear-gradient(to bottom, #3cb0fd, #3498db);
+    text-decoration: none;
+}
+
+.menu .controls button.undo,
+.menu .controls button.redo {
+    width: 75px;
+}
+
+.menu .controls button.undo {
+    margin-right: 4px;
+}
+
+.menu .vector-properties {
+    padding: 10px;
+    border: 1px solid #1f628d;
+    font-size: 16px;
+    line-height: 1.25;
+}
+
+.menu .vector-properties h3 {
+    font-size: 16px;
+    margin: 0 0 5px;
+}
+
+.menu .vector-properties .vector-prop-bold {
+    font-weight: bold;
+}
+
+.menu .vector-prop-slope {
+    display: none;
+}
