@@ -21,13 +21,13 @@ body {
 }
 
 .menu .controls {
-    margin-bottom: 20px;
+    margin-bottom: 4px;
     font-size: 12;
 }
 
 .menu .controls select {
     width: 120px;
-    margin-bottom: 8px;
+    margin-bottom: 0px;
     font-size: 18px;
 }
 
@@ -43,6 +43,15 @@ body {
     border: 2px solid #1f628d;
     text-decoration: none;
     width: 160px;
+}
+
+.menu .controls button.delete-vector {
+    width:160px;
+    margin-bottom:75px;
+}
+
+.menu .controls .inactive button {
+    color: red;
 }
 
 .menu .controls button:hover {
