@@ -553,12 +553,13 @@ var FreeBodyDraw = function(element_id, settings){
     settings.vectors = this.forceVectorsFromDescriptors(settings.forceDescriptors)
     VectorDraw.call(this, element_id, settings );
     
-    this.element.on('change', '#type',this.setSelectedFromDescription.bind(this));
-    this.element.on('change', '#on',this.setSelectedFromDescription.bind(this));
-    this.element.on('change', '#from',this.setSelectedFromDescription.bind(this)); 
+    this.element.on('change', '#type',this.onDescriptionChange.bind(this));
+    this.element.on('change', '#on',this.onDescriptionChange.bind(this));
+    this.element.on('change', '#from',this.onDescriptionChange.bind(this)); 
     this.setSelectedFromDescription();
     
     this.element.on('click', '.delete-vector', this.onDeleteDown.bind(this));
+    
 }
 // These next two lines makes FreeBodyDraw a sub-class of VectorDraw http://stackoverflow.com/a/8460616/2747370
 FreeBodyDraw.prototype = Object.create( VectorDraw.prototype );
@@ -569,7 +570,7 @@ FreeBodyDraw.prototype.template = _.template([
     '<div class="menu">',
     '    <div class="controls">',
             // This must be first <select>! (Can be hidden)
-    '        <select id="select-vector" class="hidden">',
+    '        <select id="select-vector" class="">',
     '        <!--Blank option prevents drawing without updating descriptors-->',
     '        <option></option>',
     '        <% vectors.forEach(function(vec, idx) { %>',
@@ -680,9 +681,25 @@ FreeBodyDraw.prototype.updateDescriptionFromVector = function(vector){
     this.element.find("#from")[0].value = type_on_from[2]
 }
 
+// Inherit updateVectorProperties for updating drawn vectors
 FreeBodyDraw.prototype.updateVectorProperties = function(vector){
     VectorDraw.prototype.updateVectorProperties.call(this,vector);
-    this.updateDescriptionFromVector(vector);
+
+    var describedVecIdx = this.getDescribedVectorIdx();
+    var describedVecName = this.settings.vectors[describedVecIdx].name;
+  
+    //If described vec does not match selected vector, update described vec
+    if (vector.name === describedVecName){
+        return;
+    } else{
+        this.updateDescriptionFromVector(vector);
+    }
+}
+// Add a method for updating UN-drawn vector proerties
+FreeBodyDraw.prototype.updateUndrawnVectorProperties = function(){
+    var vecIdx = this.getDescribedVectorIdx();
+    var vector = this.settings.vectors[0];
+    $('.vector-prop-name .value', this.element).html(vector.style.label); //
 }
 
 FreeBodyDraw.prototype.reset = function(){
@@ -693,6 +710,13 @@ FreeBodyDraw.prototype.reset = function(){
 FreeBodyDraw.prototype.redo = function(){
     VectorDraw.prototype.redo.call(this);
     this.setSelectedFromDescription();
+    this.updateButtonsStatus();
+}
+
+FreeBodyDraw.prototype.undo = function(){
+    VectorDraw.prototype.undo.call(this);
+    this.setSelectedFromDescription();
+    this.updateButtonsStatus();
 }
 
 FreeBodyDraw.prototype.onDeleteDown = function(){
@@ -700,11 +724,33 @@ FreeBodyDraw.prototype.onDeleteDown = function(){
     this.pushHistory();
     this.removeVector(selectedIdx);
     this.setSelectedFromDescription();
+    this.updateButtonsStatus();
 }
 
-FreeBodyDraw.prototype.redo = function(){
-    VectorDraw.prototype.redo.call(this);
+FreeBodyDraw.prototype.renderVector = function(idx, coords){
+    var line = VectorDraw.prototype.renderVector.call(this,idx, coords);
+    line.id = this.settings.vectors[idx].name;
+    return line
+}
+
+FreeBodyDraw.prototype.isDrawn = function(vecIdx){
+    return this.getMenuOption('vector', vecIdx)[0].hasAttribute("disabled")
+}
+
+FreeBodyDraw.prototype.onDescriptionChange = function(){
+    var vecIdx = this.getDescribedVectorIdx();
+    var vecName = this.settings.vectors[vecIdx].name;
+    if (this.isDrawn(vecIdx)){
+        var jsxgVector = this.board.objectsList.filter(function( obj ) {
+          return obj.id == vecName;
+        })[0];
+        this.updateVectorProperties(jsxgVector);
+    }
     this.setSelectedFromDescription();
+}
+
+FreeBodyDraw.prototype.updateButtonsStatus = function(){
+    console.log("updating buttons");
 }
 
 /////////////////////////////////////////////////////
