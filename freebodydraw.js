@@ -557,6 +557,7 @@ var FreeBodyDraw = function(element_id, settings){
     this.element.on('change', '#on',this.onDescriptionChange.bind(this));
     this.element.on('change', '#from',this.onDescriptionChange.bind(this)); 
     this.setSelectedFromDescription();
+    this.onDescriptionChange();
     
     this.element.on('click', '.delete-vector', this.onDeleteDown.bind(this));
     
@@ -738,12 +739,16 @@ FreeBodyDraw.prototype.isDrawn = function(vecIdx){
 
 FreeBodyDraw.prototype.onDescriptionChange = function(){
     var vecIdx = this.getDescribedVectorIdx();
-    var vecName = this.settings.vectors[vecIdx].name;
+    var vector = this.settings.vectors[vecIdx];
     if (this.isDrawn(vecIdx)){
         var jsxgVector = this.board.objectsList.filter(function( obj ) {
-          return obj.name == vecName && obj.elType == "arrow";
+          return obj.name == vector.name && obj.elType == "arrow";
         })[0];
         this.updateVectorProperties(jsxgVector);
+    } else {
+        $('.vector-prop-name .value', this.element).html(vector.style.label);
+        $('.vector-prop-length .value', this.element).html("");
+        $('.vector-prop-angle .value', this.element).html(""); 
     }
     this.setSelectedFromDescription();
 }
