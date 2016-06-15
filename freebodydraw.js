@@ -780,15 +780,9 @@ var getInput = function() {
     var checks = [];
 
     _.each(vectordraw.settings.expected_result, function(answer, name) {
-        var presence_check = {vector: name, check: 'presence'};
-        if ('presence_errmsg' in answer) {
-            presence_check.errmsg = answer.presence_errmsg;
-        }
-        checks.push(presence_check);
-
         [
-            'tail', 'tail_x', 'tail_y', 'tip', 'tip_x', 'tip_y', 'coords',
-            'length', 'angle', 'segment_angle', 'segment_coords', 'points_on_line'
+            'absence', 'presence', 'tail', 'tail_x', 'tail_y', 'tip', 'tip_x', 'tip_y', 
+            'coords', 'length', 'angle', 'segment_angle', 'segment_coords', 'points_on_line'
         ].forEach(function(prop) {
             if (prop in answer) {
                 var check = {vector: name, check: prop, expected: answer[prop]};
