@@ -729,7 +729,6 @@ FreeBodyDraw.prototype.onDeleteDown = function(){
 
 FreeBodyDraw.prototype.renderVector = function(idx, coords){
     var line = VectorDraw.prototype.renderVector.call(this,idx, coords);
-    line.id = this.settings.vectors[idx].name;
     return line
 }
 
@@ -742,7 +741,7 @@ FreeBodyDraw.prototype.onDescriptionChange = function(){
     var vecName = this.settings.vectors[vecIdx].name;
     if (this.isDrawn(vecIdx)){
         var jsxgVector = this.board.objectsList.filter(function( obj ) {
-          return obj.id == vecName;
+          return obj.name == vecName && obj.elType == "arrow";
         })[0];
         this.updateVectorProperties(jsxgVector);
     }
