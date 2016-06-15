@@ -31,7 +31,10 @@ def check_presence(check, vectors):
     if check['vector'] not in vectors:
         errmsg = check.get('errmsg', 'You need to use the {name} vector.')
         return errmsg.format(name=check['vector'])
-
+def check_absence(check, vectors):
+    if check['vector'] in vectors:
+        errmsg = check.get('errmsg', 'You should not use the {name} vector.')
+        return errmsg.format(name=check['vector'])
 def check_tail(check, vectors):
     vec = vectors[check['vector']]
     tolerance = check.get('tolerance', 1.0)
