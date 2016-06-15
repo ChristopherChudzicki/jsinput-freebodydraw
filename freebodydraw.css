@@ -26,7 +26,7 @@ body {
 }
 
 .menu .controls select {
-    width: 80px;
+    width: 120px;
     margin-bottom: 8px;
     font-size: 18px;
 }
@@ -53,6 +53,7 @@ body {
     background-image: -o-linear-gradient(top, #3cb0fd, #3498db);
     background-image: linear-gradient(to bottom, #3cb0fd, #3498db);
     text-decoration: none;
+    cursor:pointer;
 }
 
 .menu .controls button.undo,
@@ -82,6 +83,10 @@ body {
 
 .menu .vector-prop-slope {
     display: none;
+}
+
+.hidden {
+    display:none;
 }
 
 fieldset {
