@@ -29,7 +29,7 @@ def _errmsg_point(default_message, check, point):
 
 def check_presence(check, vectors):
     if check['vector'] not in vectors:
-        errmsg = check.get('errmsg', 'You need to use the {name} vector.')
+        errmsg = check.get('errmsg', 'You need to use the {name} vector!')
         return errmsg.format(name=check['vector'])
 def check_absence(check, vectors):
     if check['vector'] in vectors:
@@ -185,6 +185,7 @@ class Vector(object):
 class Grader(object):
     check_registry = {
         'presence': check_presence,
+        'absence': check_absence,
         'tail': check_tail,
         'tip': check_tip,
         'tail_x': check_tail_x,
