@@ -550,11 +550,15 @@ VectorDraw.prototype.setState = function(state) {
 
 /////////////////////////////////////////////////////
 var FreeBodyDraw = function(element_id, settings){
+    settings.vectors = this.forceVectorsFromDescriptors(settings.forceDescriptors)
     VectorDraw.call(this, element_id, settings );
     
     this.element.on('change', '#type',this.setSelectedFromDescription.bind(this));
     this.element.on('change', '#on',this.setSelectedFromDescription.bind(this));
-    this.element.on('change', '#from',this.setSelectedFromDescription.bind(this));
+    this.element.on('change', '#from',this.setSelectedFromDescription.bind(this)); 
+    this.setSelectedFromDescription();
+    
+    this.element.on('click', '.delete-vector', this.onDeleteDown.bind(this));
 }
 // These next two lines makes FreeBodyDraw a sub-class of VectorDraw http://stackoverflow.com/a/8460616/2747370
 FreeBodyDraw.prototype = Object.create( VectorDraw.prototype );
@@ -564,8 +568,10 @@ FreeBodyDraw.prototype.template = _.template([
     '<div class="jxgboard" style="width:<%= width %>px; height:<%= height %>px;" />',
     '<div class="menu">',
     '    <div class="controls">',
-            //This must be first <option>! (Can be hidden)
-    '        <select id="select-vector" style="display:none">',
+            // This must be first <select>! (Can be hidden)
+    '        <select id="select-vector" class="hidden">',
+    '        <!--Blank option prevents drawing without updating descriptors-->',
+    '        <option></option>',
     '        <% vectors.forEach(function(vec, idx) { %>',
     '            <option value="vector-<%= idx %>"><%= vec.description %></option>',
     '        <% }) %>',
@@ -603,6 +609,7 @@ FreeBodyDraw.prototype.template = _.template([
     '        <div class="feedback">',
     '        </div>',
     // '        <button class="add-vector"><%= add_vector_label %></button>',
+    '        <button class="delete-vector">X</button>',
     '        <button class="reset">Reset</button>',
     '        <button class="undo" title="Undo"><span class="fa fa-undo" /></button>',
     '        <button class="redo" title="redo"><span class="fa fa-repeat" /></button>',
@@ -626,7 +633,29 @@ FreeBodyDraw.prototype.template = _.template([
     '    <% } %>',
     '</div>'
 ].join('\n'));
-FreeBodyDraw.prototype.setSelectedFromDescription = function(){
+
+FreeBodyDraw.prototype.forceVectorsFromDescriptors = function(descriptors){
+    var type = descriptors[0].shortNames;
+    var on = descriptors[1].shortNames;
+    var from = descriptors[2].shortNames;
+    var vectors = [];
+    for (var i in type){
+        for (var j in on){
+            for (var k in from){
+                var vec = {};
+                vec.name = [type[i],on[j],from[k]].join("_");
+                vec.description = vec.name;
+                vec.render = false;
+                vec.style = {};
+                vec.style.label = type[i] + "<sub><sub>" + on[j] + "," + from[k] + "</sub></sub>";
+                vectors.push(vec);
+            }
+        }
+    }
+    return vectors;
+}
+
+FreeBodyDraw.prototype.getDescribedVectorIdx = function(){
     var vecName = [
         this.element.find('#type').val(),
         this.element.find('#on').val(),
@@ -635,14 +664,52 @@ FreeBodyDraw.prototype.setSelectedFromDescription = function(){
     var vecIdx = _.findIndex(this.settings.vectors, function(vec) {
         return vec.name === vecName;
     });
+    return vecIdx
+}
+
+FreeBodyDraw.prototype.setSelectedFromDescription = function(){
+    var vecIdx = this.getDescribedVectorIdx();
     //Set select the described vector from the vector dropdown
     this.element.find("#select-vector")[0].value = ("vector-" + vecIdx);
 }
+
+FreeBodyDraw.prototype.updateDescriptionFromVector = function(vector){
+    var type_on_from = vector.name.split("_");
+    this.element.find("#type")[0].value = type_on_from[0]
+    this.element.find("#on")[0].value = type_on_from[1]
+    this.element.find("#from")[0].value = type_on_from[2]
+}
+
+FreeBodyDraw.prototype.updateVectorProperties = function(vector){
+    VectorDraw.prototype.updateVectorProperties.call(this,vector);
+    this.updateDescriptionFromVector(vector);
+}
+
+FreeBodyDraw.prototype.reset = function(){
+    VectorDraw.prototype.reset.call(this);
+    this.setSelectedFromDescription();
+}
+
+FreeBodyDraw.prototype.redo = function(){
+    VectorDraw.prototype.redo.call(this);
+    this.setSelectedFromDescription();
+}
+
+FreeBodyDraw.prototype.onDeleteDown = function(){
+    var selectedIdx = this.getDescribedVectorIdx();
+    this.pushHistory();
+    this.removeVector(selectedIdx);
+    this.setSelectedFromDescription();
+}
+
+FreeBodyDraw.prototype.redo = function(){
+    VectorDraw.prototype.redo.call(this);
+    this.setSelectedFromDescription();
+}
+
 /////////////////////////////////////////////////////
 // TODO:
-// - make interface prettier
-// - add a "delete vector" button
-// - add status panel for "draw now" or "exists already"
+// - Add visual cues for when redo/undo/delete is possible
 // - Make demo problem!     
 /////////////////////////////////////////////////////
 
