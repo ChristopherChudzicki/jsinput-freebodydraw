@@ -83,3 +83,25 @@ body {
 .menu .vector-prop-slope {
     display: none;
 }
+
+fieldset {
+    display:table;
+    border:none;
+}
+fieldset p {
+    display:table-row;
+}
+
+fieldset h3 {
+    margin-top:0px;
+    margin-bottom:3px;
+    text-align:center;
+}
+fieldset select, 
+fieldset label {
+    display: table-cell;
+    margin: 3px;
+}
+fieldset label {
+    text-align: right;
+}
