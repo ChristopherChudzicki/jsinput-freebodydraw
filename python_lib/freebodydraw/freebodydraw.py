@@ -28,12 +28,16 @@ def _errmsg_point(default_message, check, point):
     return template.format(name=check['point'], x=point.x, y=point.y)
 
 def check_presence(check, vectors):
-    if check['vector'] not in vectors:
-        errmsg = check.get('errmsg', 'You need to use the {name} vector!')
+    if check['vector'] not in vectors and check['expected']:
+        errmsg = check.get('errmsg', 'You need to use the {name} vector.')
         return errmsg.format(name=check['vector'])
-def check_absence(check, vectors):
-    if check['vector'] in vectors:
+    if check['vector'] in vectors and not check['expected']:
         errmsg = check.get('errmsg', 'You should not use the {name} vector.')
+        return errmsg.format(name=check['vector'])
+def check_min_length(check, vectors):
+    vec = vectors[check['vector']]
+    errmsg = "Vector {name} is so short it's hard for us to understand. Please make {name} longer."
+    if vec.length < check['expected']:
         return errmsg.format(name=check['vector'])
 def check_tail(check, vectors):
     vec = vectors[check['vector']]
@@ -185,7 +189,6 @@ class Vector(object):
 class Grader(object):
     check_registry = {
         'presence': check_presence,
-        'absence': check_absence,
         'tail': check_tail,
         'tip': check_tip,
         'tail_x': check_tail_x,

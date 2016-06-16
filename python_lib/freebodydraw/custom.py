@@ -1,9 +1,3 @@
-def check_min_length(check, vectors):
-    vec = vectors[check['vector']]
-    errmsg = "Vector {name} is so short it's hard for us to understand. Please make {name} longer."
-    if vec.length < check['expected']:
-        return errmsg.format(name=check['vector'])
-
 def check_sum_x(check, vectors):
     total = 0
     vec_list = check['vectors']
