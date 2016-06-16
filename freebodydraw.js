@@ -550,7 +550,8 @@ VectorDraw.prototype.setState = function(state) {
 
 /////////////////////////////////////////////////////
 var FreeBodyDraw = function(element_id, settings){
-    settings.vectors = this.forceVectorsFromDescriptors(settings.forceDescriptors)
+    settings.vectors = this.forceVectorsFromDescriptors(settings.forceDescriptors);
+
     VectorDraw.call(this, element_id, settings );
     
     this.element.on('change', '#type',this.onDescriptionChange.bind(this));
