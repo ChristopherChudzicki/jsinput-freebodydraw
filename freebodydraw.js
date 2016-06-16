@@ -781,7 +781,7 @@ var getInput = function() {
 
     _.each(vectordraw.settings.expected_result, function(answer, name) {
         [
-            'absence','presence','min_length' , 'tail', 'tail_x', 'tail_y',
+            'presence','min_length' , 'tail', 'tail_x', 'tail_y',
             'tip','tip_x', 'tip_y', 'coords', 'length', 'angle',
             'segment_angle','segment_coords', 'points_on_line'
         ].forEach(function(prop) {
