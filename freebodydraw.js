@@ -749,7 +749,7 @@ FreeBodyDraw.prototype.renderVector = function(idx, coords) {
 
     var tail = this.board.create('point', coords[0], {
         name: vec.name,
-        size: 0, //FreeBodyDraw always uses arrows, so draw tail point small
+        size: -1, //FreeBodyDraw always uses arrows, so do not display tail point
         fillColor: style.pointColor,
         strokeColor: style.pointColor,
         withLabel: false,
@@ -777,7 +777,7 @@ FreeBodyDraw.prototype.renderVector = function(idx, coords) {
         strokeWidth: style.width,
         strokeColor: style.color
     });
-
+    
     tip.label.setAttribute({fontsize: 18, highlightStrokeColor: 'black'});
 
     // Disable the <option> element corresponding to vector.
