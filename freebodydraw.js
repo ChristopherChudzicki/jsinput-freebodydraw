@@ -558,7 +558,7 @@ var FreeBodyDraw = function(element_id, settings){
     this.element.on('change', '#type',this.onDescriptionChange.bind(this));
     this.element.on('change', '#on',this.onDescriptionChange.bind(this));
     this.element.on('change', '#from',this.onDescriptionChange.bind(this)); 
-    this.setSelectedFromDescription();
+    // this.setSelectedFromDescription();
     this.onDescriptionChange();
     
     this.element.on('click', '.delete-vector', this.onDeleteDown.bind(this));
@@ -671,16 +671,19 @@ FreeBodyDraw.prototype.getDescribedVectorIdx = function(){
 }
 
 FreeBodyDraw.prototype.setSelectedFromDescription = function(){
+    console.log("setSelectedFromDescription")
     var vecIdx = this.getDescribedVectorIdx();
     //Set select the described vector from the vector dropdown
     this.element.find("#select-vector")[0].value = ("vector-" + vecIdx);
 }
 
 FreeBodyDraw.prototype.updateDescriptionFromVector = function(vector){
+    console.log("updateDescriptionFromVector")
     var type_on_from = vector.name.split("_");
-    this.element.find("#type")[0].value = type_on_from[0]
-    this.element.find("#on")[0].value = type_on_from[1]
-    this.element.find("#from")[0].value = type_on_from[2]
+    //Changing a value with .val does not automatically trigger the change event, so we must trigger it ourselves.
+    this.element.find("#type").val(type_on_from[0]).trigger('change');
+    this.element.find("#on").val(type_on_from[1]).trigger('change');
+    this.element.find("#from").val(type_on_from[2]).trigger('change');
 }
 
 // Inherit updateVectorProperties for updating drawn vectors
@@ -689,7 +692,7 @@ FreeBodyDraw.prototype.updateVectorProperties = function(vector){
 
     var describedVecIdx = this.getDescribedVectorIdx();
     var describedVecName = this.settings.vectors[describedVecIdx].name;
-  
+
     //If described vec does not match selected vector, update described vec
     if (vector.name === describedVecName){
         return;
@@ -789,6 +792,7 @@ FreeBodyDraw.prototype.isDrawn = function(vecIdx){
 }
 
 FreeBodyDraw.prototype.onDescriptionChange = function(){
+    console.log("onDescriptionChange")
     var vecIdx = this.getDescribedVectorIdx();
     var vector = this.settings.vectors[vecIdx];
     if (this.isDrawn(vecIdx)){
