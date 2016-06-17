@@ -732,6 +732,7 @@ FreeBodyDraw.prototype.onDeleteDown = function(){
     this.updateButtonsStatus();
 }
 
+var x;
 // Only difference from VectorDraw.renderVector is the tail size and tip label offset
 FreeBodyDraw.prototype.renderVector = function(idx, coords) {
     var vec = this.settings.vectors[idx];
@@ -784,6 +785,8 @@ FreeBodyDraw.prototype.renderVector = function(idx, coords) {
     var option = this.getMenuOption('vector', idx);
     option.prop('disabled', true).prop('selected', false);
 
+    x = line;
+
     return line;
 };
 
@@ -796,9 +799,7 @@ FreeBodyDraw.prototype.onDescriptionChange = function(){
     var vecIdx = this.getDescribedVectorIdx();
     var vector = this.settings.vectors[vecIdx];
     if (this.isDrawn(vecIdx)){
-        var jsxgVector = this.board.objectsList.filter(function( obj ) {
-          return obj.name == vector.name && obj.elType == "arrow";
-        })[0];
+        var jsxgVector = this.findJSXGVector(vecIdx);
         this.updateVectorProperties(jsxgVector);
     } else {
         $('.vector-prop-name .value', this.element).html(vector.style.label);
@@ -806,6 +807,23 @@ FreeBodyDraw.prototype.onDescriptionChange = function(){
         $('.vector-prop-angle .value', this.element).html(""); 
     }
     this.setSelectedFromDescription();
+}
+
+FreeBodyDraw.prototype.findJSXGVector = function(vecIdx){
+    var vector = this.settings.vectors[vecIdx];
+    var jsxgVector = this.board.objectsList.filter(function( obj ) {
+              return obj.name == vector.name && obj.elType == "arrow";
+            })[0];
+            
+    return jsxgVector;
+}
+
+FreeBodyDraw.prototype.makeVectorActive = function(vecIdx){
+    var jsxgVector = this.findJSXGVector(vecIdx);
+    jsxgVector.setAttribute({
+        strokeWidth:8,
+        strokeColor:'green'
+    });
 }
 
 FreeBodyDraw.prototype.updateButtonsStatus = function(){
