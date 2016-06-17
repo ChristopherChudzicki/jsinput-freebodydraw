@@ -768,8 +768,10 @@ FreeBodyDraw.prototype.renderVector = function(idx, coords) {
 
     var style = this.makeActiveStyle(vec.style);
 
+    //tip and tail are used to draw vector
+    //labelPoint is used to place the label a constant distance from vector tip in the direction of the vector
     var tail = this.board.create('point', coords[0], {
-        name: vec.name,
+        name: vec.name + "-tail",
         size: -1, //FreeBodyDraw always uses arrows, so do not display tail point
         fillColor: style.pointColor,
         strokeColor: style.pointColor,
@@ -778,31 +780,64 @@ FreeBodyDraw.prototype.renderVector = function(idx, coords) {
         showInfoBox: false
     });
     var tip = this.board.create('point', coords[1], {
-        name: style.label || vec.name,
+        name: vec.name + "-tip", //style.label || vec.name,
         size: style.pointSize,
         fillColor: style.pointColor,
         strokeColor: style.pointColor,
-        withLabel: true,
+        withLabel: false,
         showInfoBox: false,
         label:{
             offset:[0,0]
         }
     });
-    // Not sure why, but including labelColor in attributes above doesn't work,
-    // it only works when set explicitly with setAttribute.
-    tip.setAttribute({labelColor: style.labelColor});
+    var labelPoint = this.board.createElement('point',[
+        function(){ 
+            var x = tip.X() + unitVector([tail.X(), tail.Y()], [tip.X(), tip.Y()])[0];
+            return x;
+        },
+        function(){ 
+            var y = tip.Y() + unitVector([tail.X(), tail.Y()], [tip.X(), tip.Y()])[1];
+            return y;
+        }
+    ],
+    {
+        name: style.label,
+        size:-1,
+        showInfoBox:false,
+        label:{
+            offset:[0,0],
+            highlightStrokeColor:'black',
+            cssClass:"vec-label-active",
+            highlightCssClass:"vec-label-active",
+            highlightStrokeColor: 'black',
+        }
+    });
+    function unitVector(p1,p2){
+        var dx = p2[0] - p1[0],
+            dy = p2[1] - p1[1],
+            ds = Math.sqrt(dx*dx + dy*dy);
+            
+        var ux, uy;
+        if (dx === 0){
+            ux = 0;
+        } else {
+            ux = dx/ds;
+        }
+        
+        if (dy === 0){
+            uy = 0;
+        } else {
+            uy = dy/ds;
+        }
+        
+        return [ux, uy];
+    }
 
     var line_type = (vec.type === 'vector') ? 'arrow' : vec.type;
     var line = this.board.create(line_type, [tail, tip], {
         name: vec.name,
         strokeWidth: style.width,
         strokeColor: style.color
-    });
-    
-    tip.label.setAttribute({
-        cssClass:"vec-label-active",
-        highlightCssClass:"vec-label-active",
-        highlightStrokeColor: 'black'
     });
 
     // Disable the <option> element corresponding to vector.
@@ -836,6 +871,15 @@ FreeBodyDraw.prototype.findJSXGVector = function(vecIdx){
             })[0];
             
     return jsxgVector;
+}
+
+FreeBodyDraw.prototype.findJSXGVectorLabelPoint = function(vecIdx){
+    var vectorLabel = this.settings.vectors[vecIdx].style.label;
+    var jsxgLabelPoint = this.board.objectsList.filter(function( obj ) {
+              return obj.name == vectorLabel;
+            })[0];
+                        
+    return jsxgLabelPoint;
 }
 
 FreeBodyDraw.prototype.lightenColor = function(color, amt){
@@ -876,7 +920,6 @@ FreeBodyDraw.prototype.lightenColor = function(color, amt){
 
 FreeBodyDraw.prototype.makeActiveStyle = function(vecStyle){    
     var copyOfVecStyle = $.extend(true,{},vecStyle); //Deep copy
-    console.log(this.settings)
     var activeStyle = this.settings.activeStyle
     
     copyOfVecStyle.color = this.lightenColor(copyOfVecStyle.color, activeStyle.lightness)
@@ -887,25 +930,28 @@ FreeBodyDraw.prototype.makeActiveStyle = function(vecStyle){
 FreeBodyDraw.prototype.styleVectorAsActive = function(vecIdx){
     var vecStyle = this.makeActiveStyle(this.settings.vectors[vecIdx].style);
     var jsxgVector = this.findJSXGVector(vecIdx);
+    var jsxgLabelPoint = this.findJSXGVectorLabelPoint(vecIdx);
+    
     jsxgVector.setAttribute({
         strokeWidth: vecStyle.width,
         strokeColor: vecStyle.color
     });
-    jsxgVector.point2.label.setAttribute({
+    jsxgLabelPoint.label.setAttribute({
         cssClass:"vec-label-active",
         highlightCssClass:"vec-label-active"
     });
 }
 
 FreeBodyDraw.prototype.styleVectorAsInactive = function(vecIdx){
-    var jsxgVector = this.findJSXGVector(vecIdx);
     var originalStyle = this.settings.vectors[vecIdx].style;
+    var jsxgVector = this.findJSXGVector(vecIdx);
+    var jsxgLabelPoint = this.findJSXGVectorLabelPoint(vecIdx);
     
     jsxgVector.setAttribute({
         strokeWidth: originalStyle.width,
         strokeColor: originalStyle.color
     });
-    jsxgVector.point2.label.setAttribute({
+    jsxgLabelPoint.label.setAttribute({
         cssClass:"vec-label-inactive",
         highlightCssClass:"vec-label-inactive"
     });
