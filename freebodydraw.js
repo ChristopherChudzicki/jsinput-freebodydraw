@@ -277,7 +277,8 @@ VectorDraw.prototype.renderVector = function(idx, coords) {
         fillColor: style.pointColor,
         strokeColor: style.pointColor,
         withLabel: true,
-        showInfoBox: false
+        showInfoBox: false,
+        label:{}
     });
     // Not sure why, but including labelColor in attributes above doesn't work,
     // it only works when set explicitly with setAttribute.
@@ -728,10 +729,60 @@ FreeBodyDraw.prototype.onDeleteDown = function(){
     this.updateButtonsStatus();
 }
 
-FreeBodyDraw.prototype.renderVector = function(idx, coords){
-    var line = VectorDraw.prototype.renderVector.call(this,idx, coords);
-    return line
-}
+// Only difference from VectorDraw.renderVector is the tail size and tip label offset
+FreeBodyDraw.prototype.renderVector = function(idx, coords) {
+    var vec = this.settings.vectors[idx];
+    coords = coords || this.getVectorCoordinates(vec);
+
+    // If this vector is already rendered, only update its coordinates.
+    var board_object = this.board.elementsByName[vec.name];
+    if (board_object) {
+        board_object.point1.setPosition(JXG.COORDS_BY_USER, coords[0]);
+        board_object.point2.setPosition(JXG.COORDS_BY_USER, coords[1]);
+        return;
+    }
+
+    var style = vec.style;
+
+    var tail = this.board.create('point', coords[0], {
+        name: vec.name,
+        size: 0, //FreeBodyDraw always uses arrows, so draw tail point small
+        fillColor: style.pointColor,
+        strokeColor: style.pointColor,
+        withLabel: false,
+        fixed: (vec.type === 'arrow' | vec.type === 'vector'),
+        showInfoBox: false
+    });
+    var tip = this.board.create('point', coords[1], {
+        name: style.label || vec.name,
+        size: style.pointSize,
+        fillColor: style.pointColor,
+        strokeColor: style.pointColor,
+        withLabel: true,
+        showInfoBox: false,
+        label:{
+            offset:[0,0]
+        }
+    });
+    // Not sure why, but including labelColor in attributes above doesn't work,
+    // it only works when set explicitly with setAttribute.
+    tip.setAttribute({labelColor: style.labelColor});
+
+    var line_type = (vec.type === 'vector') ? 'arrow' : vec.type;
+    var line = this.board.create(line_type, [tail, tip], {
+        name: vec.name,
+        strokeWidth: style.width,
+        strokeColor: style.color
+    });
+
+    tip.label.setAttribute({fontsize: 18, highlightStrokeColor: 'black'});
+
+    // Disable the <option> element corresponding to vector.
+    var option = this.getMenuOption('vector', idx);
+    option.prop('disabled', true).prop('selected', false);
+
+    return line;
+};
 
 FreeBodyDraw.prototype.isDrawn = function(vecIdx){
     return this.getMenuOption('vector', vecIdx)[0].hasAttribute("disabled")
