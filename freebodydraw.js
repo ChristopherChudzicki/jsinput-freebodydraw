@@ -975,8 +975,7 @@ FreeBodyDraw.prototype.updateButtonsStatus = function(){
 
 /////////////////////////////////////////////////////
 // TODO:
-// - Add visual cues for when redo/undo/delete is possible
-// - Make demo problem!     
+// - getState and setState should track active vector
 /////////////////////////////////////////////////////
 
 var vectordraw = new FreeBodyDraw('freebodydraw', freebodydraw_settings);
