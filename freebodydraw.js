@@ -555,10 +555,15 @@ var FreeBodyDraw = function(element_id, settings){
 
     VectorDraw.call(this, element_id, settings );
     
+    this.currentActiveVectorIdx = null;
+    this.settings.activeStyle = {
+        lightness: -0.5,
+        widthMultiplier:1.5
+    };
+    
     this.element.on('change', '#type',this.onDescriptionChange.bind(this));
     this.element.on('change', '#on',this.onDescriptionChange.bind(this));
     this.element.on('change', '#from',this.onDescriptionChange.bind(this)); 
-    // this.setSelectedFromDescription();
     this.onDescriptionChange();
     
     this.element.on('click', '.delete-vector', this.onDeleteDown.bind(this));
@@ -650,7 +655,7 @@ FreeBodyDraw.prototype.forceVectorsFromDescriptors = function(descriptors){
                 vec.description = vec.name;
                 vec.render = false;
                 vec.style = {};
-                vec.style.label = type[i] + "<sub><sub>" + on[j] + "," + from[k] + "</sub></sub>";
+                vec.style.label = "<span>" + type[i] + "<sub><sub>" + on[j] + "," + from[k] + "</sub></sub>" + "</span>";
                 vectors.push(vec);
             }
         }
@@ -670,15 +675,27 @@ FreeBodyDraw.prototype.getDescribedVectorIdx = function(){
     return vecIdx
 }
 
-FreeBodyDraw.prototype.setSelectedFromDescription = function(){
-    console.log("setSelectedFromDescription")
-    var vecIdx = this.getDescribedVectorIdx();
-    //Set select the described vector from the vector dropdown
+FreeBodyDraw.prototype.setActiveFromDescription = function(){     
+    var oldIdx = this.currentActiveVectorIdx;
+    var newIdx = this.getDescribedVectorIdx();
+    //Style old active vector as inactive
+    if (oldIdx != null && this.isDrawn(oldIdx) ){
+        this.styleVectorAsInactive(oldIdx);
+    }
+    //Style new active vector as active
+    if (this.isDrawn(newIdx)) {
+        this.styleVectorAsActive(newIdx);
+    }
+    
+    this.setSelectedFromIdx(newIdx);
+    this.currentActiveVectorIdx = newIdx;
+}
+
+FreeBodyDraw.prototype.setSelectedFromIdx = function(vecIdx){
     this.element.find("#select-vector")[0].value = ("vector-" + vecIdx);
 }
 
 FreeBodyDraw.prototype.updateDescriptionFromVector = function(vector){
-    console.log("updateDescriptionFromVector")
     var type_on_from = vector.name.split("_");
     //Changing a value with .val does not automatically trigger the change event, so we must trigger it ourselves.
     this.element.find("#type").val(type_on_from[0]).trigger('change');
@@ -701,26 +718,26 @@ FreeBodyDraw.prototype.updateVectorProperties = function(vector){
     }
 }
 // Add a method for updating UN-drawn vector proerties
-FreeBodyDraw.prototype.updateUndrawnVectorProperties = function(){
-    var vecIdx = this.getDescribedVectorIdx();
-    var vector = this.settings.vectors[0];
-    $('.vector-prop-name .value', this.element).html(vector.style.label); //
+FreeBodyDraw.prototype.updateUndrawnVectorProperties = function(vector){
+    $('.vector-prop-name .value', this.element).html(vector.style.label);
+    $('.vector-prop-length .value', this.element).html("");
+    $('.vector-prop-angle .value', this.element).html(""); 
 }
 
 FreeBodyDraw.prototype.reset = function(){
     VectorDraw.prototype.reset.call(this);
-    this.setSelectedFromDescription();
+    this.setActiveFromDescription();
 }
 
 FreeBodyDraw.prototype.redo = function(){
     VectorDraw.prototype.redo.call(this);
-    this.setSelectedFromDescription();
+    this.setActiveFromDescription();
     this.updateButtonsStatus();
 }
 
 FreeBodyDraw.prototype.undo = function(){
     VectorDraw.prototype.undo.call(this);
-    this.setSelectedFromDescription();
+    this.setActiveFromDescription();
     this.updateButtonsStatus();
 }
 
@@ -728,11 +745,11 @@ FreeBodyDraw.prototype.onDeleteDown = function(){
     var selectedIdx = this.getDescribedVectorIdx();
     this.pushHistory();
     this.removeVector(selectedIdx);
-    this.setSelectedFromDescription();
+    this.setActiveFromDescription();
     this.updateButtonsStatus();
 }
 
-// Only difference from VectorDraw.renderVector is the tail size and tip label offset
+// Has styling differences from VectorDraw.prototype.renderVector
 FreeBodyDraw.prototype.renderVector = function(idx, coords) {
     var vec = this.settings.vectors[idx];
     coords = coords || this.getVectorCoordinates(vec);
@@ -744,9 +761,15 @@ FreeBodyDraw.prototype.renderVector = function(idx, coords) {
         board_object.point2.setPosition(JXG.COORDS_BY_USER, coords[1]);
         return;
     }
+    
+    var style = vec.style
+    //If this vector is the active vector, style it as such. (Vectors rendered by redo are not automatically active.)
+    if (idx === this.currentActiveVectorIdx){
+        style = this.makeActiveStyle(style);
+    } 
 
-    var style = vec.style;
-
+    //tip and tail are used to draw vector
+    //labelPoint is used to place the label a constant distance from vector tip in the direction of the vector
     var tail = this.board.create('point', coords[0], {
         name: vec.name,
         size: -1, //FreeBodyDraw always uses arrows, so do not display tail point
@@ -761,15 +784,70 @@ FreeBodyDraw.prototype.renderVector = function(idx, coords) {
         size: style.pointSize,
         fillColor: style.pointColor,
         strokeColor: style.pointColor,
-        withLabel: true,
+        withLabel: false,
         showInfoBox: false,
         label:{
             offset:[0,0]
         }
     });
-    // Not sure why, but including labelColor in attributes above doesn't work,
-    // it only works when set explicitly with setAttribute.
-    tip.setAttribute({labelColor: style.labelColor});
+    var labelPoint = this.board.createElement('point',[
+        function(){ 
+            var x1 = tail.X(),
+                x2 = tip.X(),
+                y1 = tail.Y(),
+                y2 = tip.Y();
+            var x = tip.X() + labelDistance(x2-x1,y2-y1)*unitVector([x1,y1], [x2,y2])[0];
+            return x;
+        },
+        function(){ 
+            var x1 = tail.X(),
+                x2 = tip.X(),
+                y1 = tail.Y(),
+                y2 = tip.Y();
+            var y = tip.Y() + labelDistance(x2-x1,y2-y1)*unitVector([x1,y1], [x2,y2])[1];
+            return y;
+        }
+    ],
+    {
+        name: style.label,
+        size:-1,
+        showInfoBox:false,
+        label:{
+            offset:[0,0],
+            highlightStrokeColor:'black',
+            cssClass:"vec-label-active",
+            highlightCssClass:"vec-label-active",
+            highlightStrokeColor: 'black',
+        }
+    });
+    function unitVector(p1,p2){
+        var dx = p2[0] - p1[0],
+            dy = p2[1] - p1[1],
+            ds = Math.sqrt(dx*dx + dy*dy);
+            
+        var ux, uy;
+        if (dx === 0){
+            ux = 0;
+        } else {
+            ux = dx/ds;
+        }
+        
+        if (dy === 0){
+            uy = 0;
+        } else {
+            uy = dy/ds;
+        }
+        
+        return [ux, uy];
+    }
+    function labelDistance(x,y){
+        //sets distance of labelPoint from tip. Idea is to have a larger offset along -x axis.
+        //Could be improved ... a larger offset might be nice along -y axis.
+        var L = 0.75,
+            a = 5;
+            
+        return 0.5+L*a*(Math.abs(x)-x)/(1+a*Math.abs(x)+4*y*y);
+    }
 
     var line_type = (vec.type === 'vector') ? 'arrow' : vec.type;
     var line = this.board.create(line_type, [tail, tip], {
@@ -777,8 +855,6 @@ FreeBodyDraw.prototype.renderVector = function(idx, coords) {
         strokeWidth: style.width,
         strokeColor: style.color
     });
-    
-    tip.label.setAttribute({fontsize: 18, highlightStrokeColor: 'black'});
 
     // Disable the <option> element corresponding to vector.
     var option = this.getMenuOption('vector', idx);
@@ -787,35 +863,147 @@ FreeBodyDraw.prototype.renderVector = function(idx, coords) {
     return line;
 };
 
+FreeBodyDraw.prototype.removeVector = function(idx) {
+    var vec = this.settings.vectors[idx];
+    var object = this.board.elementsByName[vec.name];
+    var label = this.board.elementsByName[vec.style.label];
+    if (object) {
+        this.board.removeAncestors(object);
+        this.board.removeAncestors(label);
+        // Enable the <option> element corresponding to vector.
+        var option = this.getMenuOption('vector', idx);
+        option.prop('disabled', false);
+    }
+};
+
 FreeBodyDraw.prototype.isDrawn = function(vecIdx){
     return this.getMenuOption('vector', vecIdx)[0].hasAttribute("disabled")
 }
 
 FreeBodyDraw.prototype.onDescriptionChange = function(){
-    console.log("onDescriptionChange")
     var vecIdx = this.getDescribedVectorIdx();
     var vector = this.settings.vectors[vecIdx];
     if (this.isDrawn(vecIdx)){
-        var jsxgVector = this.board.objectsList.filter(function( obj ) {
-          return obj.name == vector.name && obj.elType == "arrow";
-        })[0];
+        var jsxgVector = this.findJSXGVector(vecIdx);
         this.updateVectorProperties(jsxgVector);
     } else {
-        $('.vector-prop-name .value', this.element).html(vector.style.label);
-        $('.vector-prop-length .value', this.element).html("");
-        $('.vector-prop-angle .value', this.element).html(""); 
+        this.updateUndrawnVectorProperties(vector);
     }
-    this.setSelectedFromDescription();
+    this.setActiveFromDescription();
+}
+
+FreeBodyDraw.prototype.findJSXGVector = function(vecIdx){
+    var vector = this.settings.vectors[vecIdx];
+    var jsxgVector = this.board.objectsList.filter(function( obj ) {
+              return obj.name == vector.name && obj.elType == "arrow";
+            })[0];
+            
+    return jsxgVector;
+}
+
+FreeBodyDraw.prototype.findJSXGVectorLabelPoint = function(vecIdx){
+    var vectorLabel = this.settings.vectors[vecIdx].style.label;
+    var jsxgLabelPoint = this.board.objectsList.filter(function( obj ) {
+        return obj.name == vectorLabel && obj.hasLabel;
+    })[0];
+    
+    return jsxgLabelPoint;
+}
+
+FreeBodyDraw.prototype.lightenColor = function(color, amt){
+    //color should be hex or named. First get hex color if it is named
+    if (color[0] != "#"){
+        //http://www.w3schools.com/colors/colors_names.asp
+        color = color.toLowerCase();
+        var namedColors = {
+            aliceblue: '#F0F8FF', antiquewhite: '#FAEBD7', aqua: '#00FFFF', aquamarine: '#7FFFD4', azure: '#F0FFFF', beige: '#F5F5DC', bisque: '#FFE4C4', black: '#000000', blanchedalmond: '#FFEBCD', blue: '#0000FF', blueviolet: '#8A2BE2', brown: '#A52A2A', burlywood: '#DEB887', cadetblue: '#5F9EA0', chartreuse: '#7FFF00', chocolate: '#D2691E', coral: '#FF7F50', cornflowerblue: '#6495ED', cornsilk: '#FFF8DC', crimson: '#DC143C', cyan: '#00FFFF', darkblue: '#00008B', darkcyan: '#008B8B', darkgoldenrod: '#B8860B', darkgray: '#A9A9A9', darkgrey: '#A9A9A9', darkgreen: '#006400', darkkhaki: '#BDB76B', darkmagenta: '#8B008B', darkolivegreen: '#556B2F', darkorange: '#FF8C00', darkorchid: '#9932CC', darkred: '#8B0000', darksalmon: '#E9967A', darkseagreen: '#8FBC8F', darkslateblue: '#483D8B', darkslategray: '#2F4F4F', darkslategrey: '#2F4F4F', darkturquoise: '#00CED1', darkviolet: '#9400D3', deeppink: '#FF1493', deepskyblue: '#00BFFF', dimgray: '#696969', dimgrey: '#696969', dodgerblue: '#1E90FF', firebrick: '#B22222', floralwhite: '#FFFAF0', forestgreen: '#228B22', fuchsia: '#FF00FF', gainsboro: '#DCDCDC', ghostwhite: '#F8F8FF', gold: '#FFD700', goldenrod: '#DAA520', gray: '#808080', grey: '#808080', green: '#008000', greenyellow: '#ADFF2F', honeydew: '#F0FFF0', hotpink: '#FF69B4', indianred: '#CD5C5C', indigo: '#4B0082', ivory: '#FFFFF0', khaki: '#F0E68C', lavender: '#E6E6FA', lavenderblush: '#FFF0F5', lawngreen: '#7CFC00', lemonchiffon: '#FFFACD', lightblue: '#ADD8E6', lightcoral: '#F08080', lightcyan: '#E0FFFF', lightgoldenrodyellow: '#FAFAD2', lightgray: '#D3D3D3', lightgrey: '#D3D3D3', lightgreen: '#90EE90', lightpink: '#FFB6C1', lightsalmon: '#FFA07A', lightseagreen: '#20B2AA', lightskyblue: '#87CEFA', lightslategray: '#778899', lightslategrey: '#778899', lightsteelblue: '#B0C4DE', lightyellow: '#FFFFE0', lime: '#00FF00', limegreen: '#32CD32', linen: '#FAF0E6', magenta: '#FF00FF', maroon: '#800000', mediumaquamarine: '#66CDAA', mediumblue: '#0000CD', mediumorchid: '#BA55D3', mediumpurple: '#9370DB', mediumseagreen: '#3CB371', mediumslateblue: '#7B68EE', mediumspringgreen: '#00FA9A', mediumturquoise: '#48D1CC', mediumvioletred: '#C71585', midnightblue: '#191970', mintcream: '#F5FFFA', mistyrose: '#FFE4E1', moccasin: '#FFE4B5', navajowhite: '#FFDEAD', navy: '#000080', oldlace: '#FDF5E6', olive: '#808000', olivedrab: '#6B8E23', orange: '#FFA500', orangered: '#FF4500', orchid: '#DA70D6', palegoldenrod: '#EEE8AA', palegreen: '#98FB98', paleturquoise: '#AFEEEE', palevioletred: '#DB7093', papayawhip: '#FFEFD5', peachpuff: '#FFDAB9', peru: '#CD853F', pink: '#FFC0CB', plum: '#DDA0DD', powderblue: '#B0E0E6', purple: '#800080', rebeccapurple: '#663399', red: '#FF0000', rosybrown: '#BC8F8F', royalblue: '#4169E1', saddlebrown: '#8B4513', salmon: '#FA8072', sandybrown: '#F4A460', seagreen: '#2E8B57', seashell: '#FFF5EE', sienna: '#A0522D', silver: '#C0C0C0', skyblue: '#87CEEB', slateblue: '#6A5ACD', slategray: '#708090', slategrey: '#708090', snow: '#FFFAFA', springgreen: '#00FF7F', steelblue: '#4682B4', tan: '#D2B48C', teal: '#008080', thistle: '#D8BFD8', tomato: '#FF6347', turquoise: '#40E0D0', violet: '#EE82EE', wheat: '#F5DEB3', white: '#FFFFFF', whitesmoke: '#F5F5F5', yellow: '#FFFF00', yellowgreen: '#9ACD32'
+        };
+        color = namedColors[color];
+    }
+    
+    if (color === undefined){
+        return false
+    }
+    
+    //Now that we have hex, let's darken it
+    //http://stackoverflow.com/a/13532993/2747370
+    var R = parseInt(color.substring(1,3),16),
+        G = parseInt(color.substring(3,5),16),
+        B = parseInt(color.substring(5,7),16);
+
+    R = parseInt(R * (1 + amt) );
+    G = parseInt(G * (1 + amt) );
+    B = parseInt(B * (1 + amt) );
+
+    R = (R<255)?R:255;  
+    G = (G<255)?G:255;  
+    B = (B<255)?B:255;  
+
+    var RR = ((R.toString(16).length==1)?"0"+R.toString(16):R.toString(16));
+    var GG = ((G.toString(16).length==1)?"0"+G.toString(16):G.toString(16));
+    var BB = ((B.toString(16).length==1)?"0"+B.toString(16):B.toString(16));
+
+    return "#"+RR+GG+BB;
+}
+
+FreeBodyDraw.prototype.makeActiveStyle = function(vecStyle){    
+    var copyOfVecStyle = $.extend(true,{},vecStyle); //Deep copy
+    var activeStyle = this.settings.activeStyle
+    
+    copyOfVecStyle.color = this.lightenColor(copyOfVecStyle.color, activeStyle.lightness)
+    copyOfVecStyle.width = activeStyle.widthMultiplier*copyOfVecStyle.width;
+    return copyOfVecStyle;
+}
+
+FreeBodyDraw.prototype.styleVectorAsActive = function(vecIdx){
+    var vecStyle = this.makeActiveStyle(this.settings.vectors[vecIdx].style);
+    var jsxgVector = this.findJSXGVector(vecIdx);
+    var jsxgLabelPoint = this.findJSXGVectorLabelPoint(vecIdx);
+    
+    jsxgVector.setAttribute({
+        strokeWidth: vecStyle.width,
+        strokeColor: vecStyle.color
+    });
+    jsxgLabelPoint.label.setAttribute({
+        cssClass:"vec-label-active",
+        highlightCssClass:"vec-label-active"
+    });
+}
+
+FreeBodyDraw.prototype.styleVectorAsInactive = function(vecIdx){
+    var originalStyle = this.settings.vectors[vecIdx].style;
+    var jsxgVector = this.findJSXGVector(vecIdx);
+    var jsxgLabelPoint = this.findJSXGVectorLabelPoint(vecIdx);
+    
+    jsxgVector.setAttribute({
+        strokeWidth: originalStyle.width,
+        strokeColor: originalStyle.color
+    });
+    jsxgLabelPoint.label.setAttribute({
+        cssClass:"vec-label-inactive",
+        highlightCssClass:"vec-label-inactive"
+    });
 }
 
 FreeBodyDraw.prototype.updateButtonsStatus = function(){
     console.log("updating buttons");
 }
 
+FreeBodyDraw.prototype.getState = function(){
+    var state = VectorDraw.prototype.getState.call(this);
+    state.currentActiveVectorIdx = this.currentActiveVectorIdx;
+    return state
+}
+
+FreeBodyDraw.prototype.setState = function(state){
+    VectorDraw.prototype.setState.call(this,state);
+    var activeVector = this.settings.vectors[state.currentActiveVectorIdx]
+    this.updateDescriptionFromVector(activeVector)
+}
+
 /////////////////////////////////////////////////////
 // TODO:
-// - Add visual cues for when redo/undo/delete is possible
-// - Make demo problem!     
+// - getState and setState should track active vector
 /////////////////////////////////////////////////////
 
 var vectordraw = new FreeBodyDraw('freebodydraw', freebodydraw_settings);
