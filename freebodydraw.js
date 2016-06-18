@@ -699,8 +699,8 @@ FreeBodyDraw.prototype.updateDescriptionFromVector = function(vector){
     var type_on_from = vector.name.split("_");
     //Changing a value with .val does not automatically trigger the change event, so we must trigger it ourselves.
     this.element.find("#type").val(type_on_from[0]).trigger('change');
-    this.element.find("#on").val(type_on_from[1]);//.trigger('change');
-    this.element.find("#from").val(type_on_from[2]);//.trigger('change');
+    this.element.find("#on").val(type_on_from[1]).trigger('change');
+    this.element.find("#from").val(type_on_from[2]).trigger('change');
 }
 
 // Inherit updateVectorProperties for updating drawn vectors
