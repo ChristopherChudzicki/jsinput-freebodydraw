@@ -678,7 +678,6 @@ FreeBodyDraw.prototype.getDescribedVectorIdx = function(){
 FreeBodyDraw.prototype.setActiveFromDescription = function(){     
     var oldIdx = this.currentActiveVectorIdx;
     var newIdx = this.getDescribedVectorIdx();
-    
     //Style old active vector as inactive
     if (oldIdx != null && this.isDrawn(oldIdx) ){
         this.styleVectorAsInactive(oldIdx);
@@ -697,7 +696,6 @@ FreeBodyDraw.prototype.setSelectedFromIdx = function(vecIdx){
 }
 
 FreeBodyDraw.prototype.updateDescriptionFromVector = function(vector){
-    console.log('updateDescriptionFromVector');
     var type_on_from = vector.name.split("_");
     //Changing a value with .val does not automatically trigger the change event, so we must trigger it ourselves.
     this.element.find("#type").val(type_on_from[0]).trigger('change');
@@ -707,7 +705,6 @@ FreeBodyDraw.prototype.updateDescriptionFromVector = function(vector){
 
 // Inherit updateVectorProperties for updating drawn vectors
 FreeBodyDraw.prototype.updateVectorProperties = function(vector){
-    console.log('updateVectorProperties')
     VectorDraw.prototype.updateVectorProperties.call(this,vector);
 
     var describedVecIdx = this.getDescribedVectorIdx();
@@ -722,7 +719,6 @@ FreeBodyDraw.prototype.updateVectorProperties = function(vector){
 }
 // Add a method for updating UN-drawn vector proerties
 FreeBodyDraw.prototype.updateUndrawnVectorProperties = function(vector){
-    console.log('updateUndrawnVectorProperties')
     $('.vector-prop-name .value', this.element).html(vector.style.label);
     $('.vector-prop-length .value', this.element).html("");
     $('.vector-prop-angle .value', this.element).html(""); 
@@ -765,13 +761,17 @@ FreeBodyDraw.prototype.renderVector = function(idx, coords) {
         board_object.point2.setPosition(JXG.COORDS_BY_USER, coords[1]);
         return;
     }
-
-    var style = this.makeActiveStyle(vec.style);
+    
+    var style = vec.style
+    //If this vector is the active vector, style it as such. (Vectors rendered by redo are not automatically active.)
+    if (idx === this.currentActiveVectorIdx){
+        style = this.makeActiveStyle(style);
+    } 
 
     //tip and tail are used to draw vector
     //labelPoint is used to place the label a constant distance from vector tip in the direction of the vector
     var tail = this.board.create('point', coords[0], {
-        name: vec.name + "-tail",
+        name: vec.name,
         size: -1, //FreeBodyDraw always uses arrows, so do not display tail point
         fillColor: style.pointColor,
         strokeColor: style.pointColor,
@@ -780,7 +780,7 @@ FreeBodyDraw.prototype.renderVector = function(idx, coords) {
         showInfoBox: false
     });
     var tip = this.board.create('point', coords[1], {
-        name: vec.name + "-tip", //style.label || vec.name,
+        name: style.label || vec.name,
         size: style.pointSize,
         fillColor: style.pointColor,
         strokeColor: style.pointColor,
@@ -865,7 +865,6 @@ FreeBodyDraw.prototype.isDrawn = function(vecIdx){
 }
 
 FreeBodyDraw.prototype.onDescriptionChange = function(){
-    console.log('onDescriptionChange')
     var vecIdx = this.getDescribedVectorIdx();
     var vector = this.settings.vectors[vecIdx];
     if (this.isDrawn(vecIdx)){
@@ -889,9 +888,9 @@ FreeBodyDraw.prototype.findJSXGVector = function(vecIdx){
 FreeBodyDraw.prototype.findJSXGVectorLabelPoint = function(vecIdx){
     var vectorLabel = this.settings.vectors[vecIdx].style.label;
     var jsxgLabelPoint = this.board.objectsList.filter(function( obj ) {
-              return obj.name == vectorLabel;
-            })[0];
-                        
+        return obj.name == vectorLabel && obj.hasLabel;
+    })[0];
+    
     return jsxgLabelPoint;
 }
 
