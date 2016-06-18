@@ -792,11 +792,19 @@ FreeBodyDraw.prototype.renderVector = function(idx, coords) {
     });
     var labelPoint = this.board.createElement('point',[
         function(){ 
-            var x = tip.X() + unitVector([tail.X(), tail.Y()], [tip.X(), tip.Y()])[0];
+            var x1 = tail.X(),
+                x2 = tip.X(),
+                y1 = tail.Y(),
+                y2 = tip.Y();
+            var x = tip.X() + labelDistance(x2-x1,y2-y1)*unitVector([x1,y1], [x2,y2])[0];
             return x;
         },
         function(){ 
-            var y = tip.Y() + unitVector([tail.X(), tail.Y()], [tip.X(), tip.Y()])[1];
+            var x1 = tail.X(),
+                x2 = tip.X(),
+                y1 = tail.Y(),
+                y2 = tip.Y();
+            var y = tip.Y() + labelDistance(x2-x1,y2-y1)*unitVector([x1,y1], [x2,y2])[1];
             return y;
         }
     ],
@@ -831,6 +839,14 @@ FreeBodyDraw.prototype.renderVector = function(idx, coords) {
         }
         
         return [ux, uy];
+    }
+    function labelDistance(x,y){
+        //sets distance of labelPoint from tip. Idea is to have a larger offset along -x axis.
+        //Could be improved ... a larger offset might be nice along -y axis.
+        var L = 0.75,
+            a = 5;
+            
+        return 0.5+L*a*(Math.abs(x)-x)/(1+a*Math.abs(x)+4*y*y);
     }
 
     var line_type = (vec.type === 'vector') ? 'arrow' : vec.type;
