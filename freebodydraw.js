@@ -578,7 +578,7 @@ FreeBodyDraw.prototype.template = _.template([
     '<div class="menu">',
     '   <div class="controls">',
         // This must be first <select>! (Can be hidden)
-    '       <select id="select-vector" class="">',
+    '       <select id="select-vector" class="hidden">',
     '       <!--Blank option prevents drawing without updating descriptors-->',
     '       <option></option>',
     '           <% vectors.forEach(function(vec, idx) { %>',
@@ -971,6 +971,18 @@ FreeBodyDraw.prototype.styleVectorAsInactive = function(vecIdx){
 
 FreeBodyDraw.prototype.updateButtonsStatus = function(){
     console.log("updating buttons");
+}
+
+FreeBodyDraw.prototype.getState = function(){
+    var state = VectorDraw.prototype.getState.call(this);
+    state.currentActiveVectorIdx = this.currentActiveVectorIdx;
+    return state
+}
+
+FreeBodyDraw.prototype.setState = function(state){
+    VectorDraw.prototype.setState.call(this,state);
+    var activeVector = this.settings.vectors[state.currentActiveVectorIdx]
+    this.updateDescriptionFromVector(activeVector)
 }
 
 /////////////////////////////////////////////////////
