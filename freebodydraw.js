@@ -847,6 +847,19 @@ FreeBodyDraw.prototype.renderVector = function(idx, coords) {
     return line;
 };
 
+FreeBodyDraw.prototype.removeVector = function(idx) {
+    var vec = this.settings.vectors[idx];
+    var object = this.board.elementsByName[vec.name];
+    var label = this.board.elementsByName[vec.style.label];
+    if (object) {
+        this.board.removeAncestors(object);
+        this.board.removeAncestors(label);
+        // Enable the <option> element corresponding to vector.
+        var option = this.getMenuOption('vector', idx);
+        option.prop('disabled', false);
+    }
+};
+
 FreeBodyDraw.prototype.isDrawn = function(vecIdx){
     return this.getMenuOption('vector', vecIdx)[0].hasAttribute("disabled")
 }
