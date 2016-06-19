@@ -90,6 +90,10 @@ body {
     font-weight: bold;
 }
 
+.menu .vector-prop-name {
+    height:30px;
+}
+
 .menu .vector-prop-slope {
     display: none;
 }

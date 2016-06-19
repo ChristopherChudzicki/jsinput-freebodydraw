@@ -579,8 +579,9 @@ FreeBodyDraw.prototype.template = _.template([
     '   <div class="controls">',
         // This must be first <select>! (Can be hidden)
     '       <select id="select-vector" class="hidden">',
-    '       <!--Blank option prevents drawing without updating descriptors-->',
-    '       <option></option>',
+    '           <!--Blank option prevents drawing w/o updating descriptors-->',
+    '           <option></option>',
+    '           <option value="none" disabled="true"></option>',
     '           <% vectors.forEach(function(vec, idx) { %>',
     '           <option value="vector-<%= idx %>"><%= vec.description %></option>',
     '           <% }) %>',
@@ -723,11 +724,17 @@ FreeBodyDraw.prototype.updateVectorProperties = function(vector){
         this.updateDescriptionFromVector(vector);
     }
 }
-// Add a method for updating UN-drawn vector proerties
+// Add a method for updating UN-drawn or non-existant vector proerties
 FreeBodyDraw.prototype.updateUndrawnVectorProperties = function(vector){
-    $('.vector-prop-name .value', this.element).html(vector.style.label);
     $('.vector-prop-length .value', this.element).html("");
-    $('.vector-prop-angle .value', this.element).html(""); 
+    $('.vector-prop-angle .value', this.element).html("");
+    //update vector label; if vector does not exist, show blank name.
+    if (vector===undefined){
+        var vecLabel = "---";
+    } else {
+        var vecLabel = vector.style.label;
+    }
+    $('.vector-prop-name .value', this.element).html(vecLabel);
 }
 
 FreeBodyDraw.prototype.reset = function(){
@@ -888,9 +895,17 @@ FreeBodyDraw.prototype.isDrawn = function(vecIdx){
 
 FreeBodyDraw.prototype.onDescriptionChange = function(){
     //Objects cannot exert forces on themselves; if on=by, warn user
+    //deactive active vector, change properties, and exit.
     if ( $("#on").val()===$("#from").val() ){
         $("#on-warning").removeClass('hidden');
         $("#from-warning").removeClass('hidden');
+        this.element.find("#select-vector")[0].value = ("none");
+        this.updateUndrawnVectorProperties(vector);
+        var oldIdx = this.currentActiveVectorIdx;
+        if (oldIdx != null && this.isDrawn(oldIdx) ){
+            this.styleVectorAsInactive(oldIdx);
+        }
+        return
     } else {
         $("#on-warning").addClass('hidden');
         $("#from-warning").addClass('hidden');
