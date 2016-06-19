@@ -599,6 +599,9 @@ FreeBodyDraw.prototype.template = _.template([
     '                   <option value="<%=val%>"> <%= forceDescriptors[1].longNames[idx] %> </option>',
     '                   <% }) %>',
     '               </select>',
+    '               <span id="on-warning" class="warning">',
+    '                   <i class="fa fa-exclamation-triangle"></i>',
+    '               </span>',
     '           </p>',
     '           <p>',
     '               <label>from: </label>',
@@ -607,6 +610,9 @@ FreeBodyDraw.prototype.template = _.template([
     '                   <option value="<%=val%>"> <%= forceDescriptors[2].longNames[idx] %> </option>',
     '                   <% }) %>',
     '               </select>',
+    '               <span id="from-warning" class="warning">',
+    '                   <i class="fa fa-exclamation-triangle"></i>',
+    '               </span>',
     '           </p>',
     '           <p>',
     '               <label>type: </label>',
@@ -881,6 +887,15 @@ FreeBodyDraw.prototype.isDrawn = function(vecIdx){
 }
 
 FreeBodyDraw.prototype.onDescriptionChange = function(){
+    //Objects cannot exert forces on themselves; if on=by, warn user
+    if ( $("#on").val()===$("#from").val() ){
+        $("#on-warning").removeClass('hidden');
+        $("#from-warning").removeClass('hidden');
+    } else {
+        $("#on-warning").addClass('hidden');
+        $("#from-warning").addClass('hidden');
+    }
+    
     var vecIdx = this.getDescribedVectorIdx();
     var vector = this.settings.vectors[vecIdx];
     if (this.isDrawn(vecIdx)){

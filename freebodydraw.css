@@ -16,17 +16,16 @@ body {
 
 .menu {
     float: left;
-    width: 160px;
+    width: 190px;
     margin-left: 15px;
 }
 
 .menu .controls {
-    margin-bottom: 4px;
     font-size: 12;
 }
 
 .menu .controls select {
-    width: 120px;
+    width: 115px;
     margin-bottom: 0px;
     font-size: 18px;
 }
@@ -75,6 +74,7 @@ body {
 }
 
 .menu .vector-properties {
+    width:135px;
     padding: 10px;
     border: 1px solid #1f628d;
     font-size: 16px;
@@ -100,7 +100,11 @@ body {
 
 fieldset {
     display:table;
+    margin:0px;
     border:none;
+    padding-left:0px;
+    padding-right:0px;
+    padding-top:0px;
 }
 fieldset p {
     display:table-row;
@@ -118,6 +122,10 @@ fieldset label {
 }
 fieldset label {
     text-align: right;
+}
+
+fieldset .warning i {
+    color:#ffcc00;
 }
 
 .vec-label-active span {
