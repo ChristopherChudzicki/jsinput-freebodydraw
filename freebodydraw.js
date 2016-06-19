@@ -564,7 +564,6 @@ var FreeBodyDraw = function(element_id, settings){
     this.element.on('change', '#type',this.onDescriptionChange.bind(this));
     this.element.on('change', '#on',this.onDescriptionChange.bind(this));
     this.element.on('change', '#from',this.onDescriptionChange.bind(this)); 
-    this.onDescriptionChange();
     
     this.element.on('click', '.delete-vector', this.onDeleteDown.bind(this));
     
@@ -596,28 +595,31 @@ FreeBodyDraw.prototype.template = _.template([
     '           <p>',
     '               <label>on: </label>',
     '               <select id="on">',
+    '                   <option disabled selected>...</option>',
     '                   <% forceDescriptors[1].shortNames.forEach(function(val,idx) { %>',
     '                   <option value="<%=val%>"> <%= forceDescriptors[1].longNames[idx] %> </option>',
     '                   <% }) %>',
     '               </select>',
-    '               <span id="on-warning" class="warning">',
+    '               <span id="on-warning" class="warning hidden">',
     '                   <i class="fa fa-exclamation-triangle"></i>',
     '               </span>',
     '           </p>',
     '           <p>',
     '               <label>from: </label>',
     '               <select id="from">',
+    '                   <option disabled selected>...</option>',
     '                   <% forceDescriptors[2].shortNames.forEach(function(val,idx) { %>',
     '                   <option value="<%=val%>"> <%= forceDescriptors[2].longNames[idx] %> </option>',
     '                   <% }) %>',
     '               </select>',
-    '               <span id="from-warning" class="warning">',
+    '               <span id="from-warning" class="warning hidden">',
     '                   <i class="fa fa-exclamation-triangle"></i>',
     '               </span>',
     '           </p>',
     '           <p>',
     '               <label>type: </label>',
     '               <select id="type">',
+    '                   <option disabled selected>...</option>',
     '                   <% forceDescriptors[0].shortNames.forEach(function(val,idx) { %>',
     '                   <option value="<%=val%>"> <%= forceDescriptors[0].longNames[idx] %> </option>',
     '                   <% }) %>',
@@ -730,7 +732,7 @@ FreeBodyDraw.prototype.updateUndrawnVectorProperties = function(vector){
     $('.vector-prop-angle .value', this.element).html("");
     //update vector label; if vector does not exist, show blank name.
     if (vector===undefined){
-        var vecLabel = "---";
+        var vecLabel = "-";
     } else {
         var vecLabel = vector.style.label;
     }
@@ -894,9 +896,20 @@ FreeBodyDraw.prototype.isDrawn = function(vecIdx){
 }
 
 FreeBodyDraw.prototype.onDescriptionChange = function(){
+    console.log("onDescriptionChange")
+    var abort = false;
+    var onVal = $("#on").val(),
+        fromVal = $("#from").val(),
+        typeVal = $("#type").val();
+    //If any option is blank, return immediately.
+    //Should never happen once a vector has been selected
+    if (onVal === null || fromVal === null || typeVal === null ){
+        abort = true;
+    }
+    
     //Objects cannot exert forces on themselves; if on=by, warn user
     //deactive active vector, change properties, and exit.
-    if ( $("#on").val()===$("#from").val() ){
+    if (onVal === fromVal && onVal != null ){
         $("#on-warning").removeClass('hidden');
         $("#from-warning").removeClass('hidden');
         this.element.find("#select-vector")[0].value = ("none");
@@ -905,10 +918,14 @@ FreeBodyDraw.prototype.onDescriptionChange = function(){
         if (oldIdx != null && this.isDrawn(oldIdx) ){
             this.styleVectorAsInactive(oldIdx);
         }
-        return
+        abort = true;
     } else {
         $("#on-warning").addClass('hidden');
         $("#from-warning").addClass('hidden');
+    }
+    
+    if (abort){
+        return;
     }
     
     var vecIdx = this.getDescribedVectorIdx();
