@@ -659,13 +659,15 @@ FreeBodyDraw.prototype.forceVectorsFromDescriptors = function(descriptors){
     for (var i in type){
         for (var j in on){
             for (var k in from){
-                var vec = {};
-                vec.name = [type[i],on[j],from[k]].join("_");
-                vec.description = vec.name;
-                vec.render = false;
-                vec.style = {};
-                vec.style.label = "<span>" + type[i] + "<sub><sub>" + on[j] + "," + from[k] + "</sub></sub>" + "</span>";
-                vectors.push(vec);
+                if (on[j] != from[k]){
+                    var vec = {};
+                    vec.name = [type[i],on[j],from[k]].join("_");
+                    vec.description = vec.name;
+                    vec.render = false;
+                    vec.style = {};
+                    vec.style.label = "<span>" + type[i] + "<sub><sub>" + on[j] + "," + from[k] + "</sub></sub>" + "</span>";
+                    vectors.push(vec);
+                }
             }
         }
     }
@@ -737,11 +739,6 @@ FreeBodyDraw.prototype.updateUndrawnVectorProperties = function(vector){
         var vecLabel = vector.style.label;
     }
     $('.vector-prop-name .value', this.element).html(vecLabel);
-}
-
-FreeBodyDraw.prototype.reset = function(){
-    VectorDraw.prototype.reset.call(this);
-    this.setActiveFromDescription();
 }
 
 FreeBodyDraw.prototype.redo = function(){
