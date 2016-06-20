@@ -1050,26 +1050,26 @@ FreeBodyDraw.prototype.setState = function(state){
 // - getState and setState should track active vector
 /////////////////////////////////////////////////////
 
-var vectordraw = new FreeBodyDraw('freebodydraw', freebodydraw_settings);
+var freebodydraw = new FreeBodyDraw('freebodydraw', freebodydraw_settings);
 
 var getState = function() {
-    var state = vectordraw.getState();
+    var state = freebodydraw.getState();
     return JSON.stringify(state);
 };
 
 var setState = function(serialized) {
-    vectordraw.setState(JSON.parse(serialized));
+    freebodydraw.setState(JSON.parse(serialized));
 };
 
 var getInput = function() {
-    var input = vectordraw.getState();
+    var input = freebodydraw.getState();
 
     // Transform the expected_result setting into a list of checks.
-    var expected_results = vectordraw.settings.expected_result;
+    var expected_results = freebodydraw.settings.expected_result;
     var checks = [];
 
     //First check that vectors not explicitly included in expected_results are absent
-    _.each(vectordraw.settings.vectors, function(vec, idx){
+    _.each(freebodydraw.settings.vectors, function(vec, idx){
         if ( !expected_results.hasOwnProperty(vec.name) ){
             var absence_check = {vector:vec.name, check:'presence', expected:false}
             checks.push(absence_check);
@@ -1104,7 +1104,7 @@ var getInput = function() {
         });
     });
 
-    input.checks = checks.concat(vectordraw.settings.custom_checks);
+    input.checks = checks.concat(freebodydraw.settings.custom_checks);
     
     return JSON.stringify(input);
 };
