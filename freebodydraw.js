@@ -1065,13 +1065,31 @@ var getInput = function() {
     var input = vectordraw.getState();
 
     // Transform the expected_result setting into a list of checks.
+    var expected_results = vectordraw.settings.expected_result;
     var checks = [];
 
-    _.each(vectordraw.settings.expected_result, function(answer, name) {
+    //First check that vectors not explicitly included in expected_results are absent
+    _.each(vectordraw.settings.vectors, function(vec, idx){
+        if ( !expected_results.hasOwnProperty(vec.name) ){
+            var absence_check = {vector:vec.name, check:'presence', expected:false}
+            checks.push(absence_check);
+        }
+    });
+
+    //Now check vectors explicitly included in expected_results
+    _.each(expected_results, function(answer, name) {
+        var presence_check = {vector: name, check: 'presence', expected:true};
+        if ('presence' in answer) {
+            presence_check.expected = answer.presence;
+        }
+        if ('presence_errmsg' in answer) {
+            presence_check.errmsg = answer.presence_errmsg;
+        }
+        checks.push(presence_check);
+
         [
-            'presence','min_length' , 'tail', 'tail_x', 'tail_y',
-            'tip','tip_x', 'tip_y', 'coords', 'length', 'angle',
-            'segment_angle','segment_coords', 'points_on_line'
+            'tail', 'tail_x', 'tail_y', 'tip', 'tip_x', 'tip_y', 'coords',
+            'length', 'angle', 'segment_angle', 'segment_coords', 'points_on_line'
         ].forEach(function(prop) {
             if (prop in answer) {
                 var check = {vector: name, check: prop, expected: answer[prop]};
@@ -1087,6 +1105,6 @@ var getInput = function() {
     });
 
     input.checks = checks.concat(vectordraw.settings.custom_checks);
-
+    
     return JSON.stringify(input);
 };
