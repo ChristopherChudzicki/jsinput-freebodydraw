@@ -674,16 +674,20 @@ FreeBodyDraw.prototype.forceVectorsFromDescriptors = function(descriptors){
     return vectors;
 }
 
+FreeBodyDraw.prototype.getNamedVectorIdx = function(vecName){
+    var vecIdx = _.findIndex(this.settings.vectors, function(vec) {
+        return vec.name === vecName;
+    });
+    return vecIdx
+}
+
 FreeBodyDraw.prototype.getDescribedVectorIdx = function(){
     var vecName = [
         this.element.find('#type').val(),
         this.element.find('#on').val(),
         this.element.find('#from').val()
     ].join("_");
-    var vecIdx = _.findIndex(this.settings.vectors, function(vec) {
-        return vec.name === vecName;
-    });
-    return vecIdx
+    return this.getNamedVectorIdx(vecName);
 }
 
 FreeBodyDraw.prototype.setActiveFromDescription = function(){     
@@ -827,8 +831,8 @@ FreeBodyDraw.prototype.renderVector = function(idx, coords) {
         label:{
             offset:[0,0],
             highlightStrokeColor:'black',
-            cssClass:"vec-label-active",
-            highlightCssClass:"vec-label-active",
+            cssClass:"vec-label active",
+            highlightCssClass:"vec-label active",
             highlightStrokeColor: 'black',
         }
     });
@@ -1009,8 +1013,8 @@ FreeBodyDraw.prototype.styleVectorAsActive = function(vecIdx){
         strokeColor: vecStyle.color
     });
     jsxgLabelPoint.label.setAttribute({
-        cssClass:"vec-label-active",
-        highlightCssClass:"vec-label-active"
+        cssClass:"vec-label active",
+        highlightCssClass:"vec-label active"
     });
 }
 
@@ -1024,8 +1028,8 @@ FreeBodyDraw.prototype.styleVectorAsInactive = function(vecIdx){
         strokeColor: originalStyle.color
     });
     jsxgLabelPoint.label.setAttribute({
-        cssClass:"vec-label-inactive",
-        highlightCssClass:"vec-label-inactive"
+        cssClass:"vec-label inactive",
+        highlightCssClass:"vec-label inactive"
     });
 }
 
@@ -1063,22 +1067,35 @@ var setState = function(serialized) {
 
 var getInput = function() {
     var input = freebodydraw.getState();
-
+    
     // Transform the expected_result setting into a list of checks.
+    var vectors = freebodydraw.settings.vectors;
     var expected_results = freebodydraw.settings.expected_result;
     var checks = [];
 
     //First check that vectors not explicitly included in expected_results are absent
-    _.each(freebodydraw.settings.vectors, function(vec, idx){
+    _.each(vectors, function(vec, idx){
         if ( !expected_results.hasOwnProperty(vec.name) ){
-            var absence_check = {vector:vec.name, check:'presence', expected:false}
+            var absence_check = {
+                vector:vec.name, 
+                check:'presence',
+                expected:false, 
+                label:vec.style.label || vec.name
+            }
             checks.push(absence_check);
         }
     });
 
     //Now check vectors explicitly included in expected_results
     _.each(expected_results, function(answer, name) {
-        var presence_check = {vector: name, check: 'presence', expected:true};
+        var vecIdx = freebodydraw.getNamedVectorIdx(name);
+        var vecLabel = vectors[vecIdx].style.label || name;
+        var presence_check = {
+            vector: name,
+            check: 'presence',
+            expected:true,
+            label: vecLabel
+        };
         if ('presence' in answer) {
             presence_check.expected = answer.presence;
         }
@@ -1092,7 +1109,12 @@ var getInput = function() {
             'length', 'angle', 'segment_angle', 'segment_coords', 'points_on_line'
         ].forEach(function(prop) {
             if (prop in answer) {
-                var check = {vector: name, check: prop, expected: answer[prop]};
+                var check = {
+                    vector: name, 
+                    check: prop,
+                    expected: answer[prop],
+                    label: vecLabel
+                };
                 if (prop + '_tolerance' in answer) {
                     check.tolerance = answer[prop + '_tolerance'];
                 }
