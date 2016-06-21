@@ -136,7 +136,12 @@ fieldset .warning i {
     font-size:20px;
     font-weight:bold;
 }
+
 .vec-label.inactive span {
     font-size:16px;
     font-weight:normal;
+}
+
+.vec-label sub {
+    font-size:90%
 }
