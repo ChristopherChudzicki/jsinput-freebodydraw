@@ -132,11 +132,11 @@ fieldset .warning i {
     color:#ffcc00;
 }
 
-.vec-label-active span {
+.vec-label.active span {
     font-size:20px;
     font-weight:bold;
 }
-.vec-label-inactive span {
+.vec-label.inactive span {
     font-size:16px;
     font-weight:normal;
 }

@@ -831,8 +831,8 @@ FreeBodyDraw.prototype.renderVector = function(idx, coords) {
         label:{
             offset:[0,0],
             highlightStrokeColor:'black',
-            cssClass:"vec-label-active",
-            highlightCssClass:"vec-label-active",
+            cssClass:"vec-label active",
+            highlightCssClass:"vec-label active",
             highlightStrokeColor: 'black',
         }
     });
@@ -1013,8 +1013,8 @@ FreeBodyDraw.prototype.styleVectorAsActive = function(vecIdx){
         strokeColor: vecStyle.color
     });
     jsxgLabelPoint.label.setAttribute({
-        cssClass:"vec-label-active",
-        highlightCssClass:"vec-label-active"
+        cssClass:"vec-label active",
+        highlightCssClass:"vec-label active"
     });
 }
 
@@ -1028,8 +1028,8 @@ FreeBodyDraw.prototype.styleVectorAsInactive = function(vecIdx){
         strokeColor: originalStyle.color
     });
     jsxgLabelPoint.label.setAttribute({
-        cssClass:"vec-label-inactive",
-        highlightCssClass:"vec-label-inactive"
+        cssClass:"vec-label inactive",
+        highlightCssClass:"vec-label inactive"
     });
 }
 
