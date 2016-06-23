@@ -778,10 +778,12 @@ FreeBodyDraw.prototype.renderVector = function(idx, coords) {
         return;
     }
     
-    var style = vec.style
+    var style = vec.style,
+        labelStyle = "vec-label"
     //If this vector is the active vector, style it as such. (Vectors rendered by redo are not automatically active.)
     if (idx === this.currentActiveVectorIdx){
         style = this.makeActiveStyle(style);
+        labelStyle += " active"
     } 
 
     //tip and tail are used to draw vector
@@ -831,8 +833,8 @@ FreeBodyDraw.prototype.renderVector = function(idx, coords) {
         label:{
             offset:[0,0],
             highlightStrokeColor:'black',
-            cssClass:"vec-label active",
-            highlightCssClass:"vec-label active",
+            cssClass: labelStyle,
+            highlightCssClass: labelStyle,
             highlightStrokeColor: 'black',
         }
     });
@@ -1028,8 +1030,8 @@ FreeBodyDraw.prototype.styleVectorAsInactive = function(vecIdx){
         strokeColor: originalStyle.color
     });
     jsxgLabelPoint.label.setAttribute({
-        cssClass:"vec-label inactive",
-        highlightCssClass:"vec-label inactive"
+        cssClass:"vec-label",
+        highlightCssClass:"vec-label"
     });
 }
 
