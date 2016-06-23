@@ -601,6 +601,7 @@ var FreeBodyDraw = function(element_id, settings){
     
     this.element.on('click', '.delete-vector', this.onDeleteDown.bind(this));
     
+    this.updateButtonsStatus();
 }
 // These next two lines makes FreeBodyDraw a sub-class of VectorDraw http://stackoverflow.com/a/8460616/2747370
 FreeBodyDraw.prototype = Object.create( VectorDraw.prototype );
@@ -724,7 +725,7 @@ FreeBodyDraw.prototype.getDescribedVectorIdx = function(){
     return this.getNamedVectorIdx(vecName);
 }
 
-FreeBodyDraw.prototype.setActiveFromDescription = function(){     
+FreeBodyDraw.prototype.setActiveFromDescription = function(){
     var oldIdx = this.currentActiveVectorIdx;
     var newIdx = this.getDescribedVectorIdx();
     //Style old active vector as inactive
@@ -935,9 +936,9 @@ FreeBodyDraw.prototype.isDrawn = function(vecIdx){
 FreeBodyDraw.prototype.onDescriptionChange = function(){
     console.log("onDescriptionChange")
     var abort = false;
-    var onVal = $("#on").val(),
-        fromVal = $("#from").val(),
-        typeVal = $("#type").val();
+    var onVal = $("#on", this.element).val(),
+        fromVal = $("#from", this.element).val(),
+        typeVal = $("#type", this.element).val();
     //If any option is blank, return immediately.
     //Should never happen once a vector has been selected
     if (onVal === null || fromVal === null || typeVal === null ){
@@ -947,8 +948,8 @@ FreeBodyDraw.prototype.onDescriptionChange = function(){
     //Objects cannot exert forces on themselves; if on=by, warn user
     //deactive active vector, change properties, and exit.
     if (onVal === fromVal && onVal != null ){
-        $("#on-warning").removeClass('hidden');
-        $("#from-warning").removeClass('hidden');
+        $("#on-warning", this.element).removeClass('hidden');
+        $("#from-warning", this.element).removeClass('hidden');
         this.element.find("#select-vector")[0].value = ("none");
         this.updateUndrawnVectorProperties(vector);
         var oldIdx = this.currentActiveVectorIdx;
@@ -957,8 +958,8 @@ FreeBodyDraw.prototype.onDescriptionChange = function(){
         }
         abort = true;
     } else {
-        $("#on-warning").addClass('hidden');
-        $("#from-warning").addClass('hidden');
+        $("#on-warning", this.element).addClass('hidden');
+        $("#from-warning", this.element).addClass('hidden');
     }
     
     if (abort){
