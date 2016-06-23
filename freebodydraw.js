@@ -602,6 +602,7 @@ var FreeBodyDraw = function(element_id, settings){
     this.element.on('click', '.delete-vector', this.onDeleteDown.bind(this));
     
     this.updateButtonsStatus();
+    $('.reset',this.element).addClass('inactive');
 }
 // These next two lines makes FreeBodyDraw a sub-class of VectorDraw http://stackoverflow.com/a/8460616/2747370
 FreeBodyDraw.prototype = Object.create( VectorDraw.prototype );
@@ -739,6 +740,8 @@ FreeBodyDraw.prototype.setActiveFromDescription = function(){
     
     this.setSelectedFromIdx(newIdx);
     this.currentActiveVectorIdx = newIdx;
+    
+    this.updateDeleteStatus();
 }
 
 FreeBodyDraw.prototype.setSelectedFromIdx = function(vecIdx){
@@ -781,15 +784,29 @@ FreeBodyDraw.prototype.updateUndrawnVectorProperties = function(vector){
 }
 
 FreeBodyDraw.prototype.redo = function(){
+    if ($('.redo',this.element).hasClass('inactive')){
+        return;
+    }
     VectorDraw.prototype.redo.call(this);
     this.setActiveFromDescription();
     this.updateButtonsStatus();
 }
 
 FreeBodyDraw.prototype.undo = function(){
+    if ($('.undo',this.element).hasClass('inactive')){
+        return;
+    }
     VectorDraw.prototype.undo.call(this);
     this.setActiveFromDescription();
     this.updateButtonsStatus();
+}
+
+FreeBodyDraw.prototype.reset = function(){
+    if ($('.reset',this.element).hasClass('inactive')){
+        return;
+    }
+    var state = VectorDraw.prototype.reset.call(this);
+    $('.reset', this.element).addClass('inactive');
 }
 
 FreeBodyDraw.prototype.onDeleteDown = function(){
@@ -930,7 +947,11 @@ FreeBodyDraw.prototype.removeVector = function(idx) {
 };
 
 FreeBodyDraw.prototype.isDrawn = function(vecIdx){
-    return this.getMenuOption('vector', vecIdx)[0].hasAttribute("disabled")
+    if (vecIdx === null){
+        return null
+    } else {
+        return this.getMenuOption('vector', vecIdx)[0].hasAttribute("disabled")
+    }   
 }
 
 FreeBodyDraw.prototype.onDescriptionChange = function(){
@@ -1070,8 +1091,28 @@ FreeBodyDraw.prototype.styleVectorAsInactive = function(vecIdx){
     });
 }
 
+FreeBodyDraw.prototype.updateDeleteStatus = function(){
+    console.log("updateDeleteStatus")
+    $('.delete-vector',this.element).addClass('inactive')
+    if (this.isDrawn(this.currentActiveVectorIdx)){
+        $('.delete-vector',this.element).removeClass('inactive')
+    }
+}
+
 FreeBodyDraw.prototype.updateButtonsStatus = function(){
     console.log("updating buttons");
+    var undoEmpty = this.history_stack.undo.length === 0,
+    redoEmpty = this.history_stack.redo.length === 0;
+    
+    $('.reset', this.element).removeClass('inactive');
+    $('.undo, .redo', this.element).addClass('inactive');
+    if (!undoEmpty){
+        $('.undo',this.element).removeClass('inactive');
+    }
+    if (!redoEmpty){
+        $('.redo',this.element).removeClass('inactive');
+    }
+    this.updateDeleteStatus();
 }
 
 FreeBodyDraw.prototype.onBoardDown = function(evt){
@@ -1082,6 +1123,7 @@ FreeBodyDraw.prototype.onBoardDown = function(evt){
 FreeBodyDraw.prototype.onBoardUp = function(evt){
     enableScroll();
     VectorDraw.prototype.onBoardUp.call(this,evt);
+    this.updateButtonsStatus();
 }
 
 FreeBodyDraw.prototype.getState = function(){
@@ -1094,6 +1136,7 @@ FreeBodyDraw.prototype.setState = function(state){
     VectorDraw.prototype.setState.call(this,state);
     var activeVector = this.settings.vectors[state.currentActiveVectorIdx]
     this.updateDescriptionFromVector(activeVector)
+    this.updateButtonsStatus();
 }
 
 /////////////////////////////////////////////////////
