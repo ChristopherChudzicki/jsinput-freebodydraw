@@ -30,9 +30,11 @@ def _errmsg_point(default_message, check, point):
 
 def check_presence(check, vectors):
     if check['vector'] not in vectors and check['expected']:
-        return _errmsg('You need to use the {label} vector.',check,vectors)
+        errmsg = check.get('errmsg', 'You need to use the {label} vector.')
+        return errmsg.format(label=check['label'])
     if check['vector'] in vectors and not check['expected']:
-        return _errmsg('You should not use the {label} vector.',check,vectors)
+        errmsg = check.get('errmsg', 'You should not use the {label} vector.')
+        return errmsg.format(label=check['label'])
 def check_min_length(check, vectors):
     vec = vectors[check['vector']]
     if vec.length < check['expected']:
