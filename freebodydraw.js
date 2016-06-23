@@ -806,6 +806,7 @@ FreeBodyDraw.prototype.reset = function(){
         return;
     }
     var state = VectorDraw.prototype.reset.call(this);
+    this.updateButtonsStatus();
     $('.reset', this.element).addClass('inactive');
 }
 
