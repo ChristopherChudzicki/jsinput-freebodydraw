@@ -36,10 +36,6 @@ body {
     font-size: 18px;
 }
 
-.menu .controls select option {
-    color:red;
-}
-
 .menu .controls button {
     display: inline-block;
     background-color: #3498db;
