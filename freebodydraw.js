@@ -587,22 +587,19 @@ function enableScroll() {
 var FreeBodyDraw = function(element_id, settings){
     settings.vectors = this.forceVectorsFromDescriptors(settings.forceDescriptors);
 
-    VectorDraw.call(this, element_id, settings );
-    
     this.currentActiveVectorIdx = null;
-    this.settings.activeStyle = {
+    settings.activeStyle = {
         lightness: -0.5,
         widthMultiplier:1.5
     };
+
+    VectorDraw.call(this, element_id, settings );
     
     this.element.on('change', '#type',this.onDescriptionChange.bind(this));
     this.element.on('change', '#on',this.onDescriptionChange.bind(this));
     this.element.on('change', '#from',this.onDescriptionChange.bind(this)); 
     
     this.element.on('click', '.delete-vector', this.onDeleteDown.bind(this));
-    
-    this.updateButtonsStatus();
-    $('.reset',this.element).addClass('inactive');
 }
 // These next two lines makes FreeBodyDraw a sub-class of VectorDraw http://stackoverflow.com/a/8460616/2747370
 FreeBodyDraw.prototype = Object.create( VectorDraw.prototype );
@@ -783,6 +780,12 @@ FreeBodyDraw.prototype.updateUndrawnVectorProperties = function(vector){
     $('.vector-prop-name .value', this.element).html(vecLabel);
 }
 
+FreeBodyDraw.prototype.render = function(){
+    VectorDraw.prototype.render.call(this);
+    this.updateButtonsStatus();
+    $('.reset',this.element).addClass('inactive');
+}
+
 FreeBodyDraw.prototype.redo = function(){
     if ($('.redo',this.element).hasClass('inactive')){
         return;
@@ -806,8 +809,6 @@ FreeBodyDraw.prototype.reset = function(){
         return;
     }
     var state = VectorDraw.prototype.reset.call(this);
-    this.updateButtonsStatus();
-    $('.reset', this.element).addClass('inactive');
 }
 
 FreeBodyDraw.prototype.onDeleteDown = function(){
