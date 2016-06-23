@@ -606,7 +606,7 @@ FreeBodyDraw.prototype = Object.create( VectorDraw.prototype );
 FreeBodyDraw.prototype.constructor = FreeBodyDraw;
 
 FreeBodyDraw.prototype.template = _.template([
-    '<div class="jxgboard" style="width:<%= width %>px; height:<%= height %>px;" />',
+    '<div class="header">',
     '<div class="menu">',
     '   <div class="controls">',
         // This must be first <select>! (Can be hidden)
@@ -622,9 +622,6 @@ FreeBodyDraw.prototype.template = _.template([
     '           <% }}) %>',
     '       </select>',
     '       <fieldset>',
-    '           <div class="vector-prop-name">',
-    '               <h3>Force: <span class="value vector-prop-bold">-</span></h3>',
-    '           </div>',
     '           <p>',
     '               <label>on: </label>',
     '               <select id="on">',
@@ -660,6 +657,11 @@ FreeBodyDraw.prototype.template = _.template([
     '           </p>',
     '       </fieldset>',
     '   </div>',
+    '   <div class="vector-properties">',
+    '       <div class="vector-prop-name">',
+    '           <span class="value vector-prop-bold">-</span>',
+    '       </div>',
+    '   </div>',
     '   <% if (show_vector_properties) { %>',
     '   <div class="vector-properties">',
 //  '       <h3><%= vector_properties_label %></h3>',
@@ -674,15 +676,21 @@ FreeBodyDraw.prototype.template = _.template([
     '       </div>',
     '   </div>',
     '   <% } %>',
+    '</div>',
+    '</div>',
+    '<div class="jxgboard" style="width:<%= width %>px; height:<%= height %>px;" />',
+    '<div class="footer">',
+    '<div class="menu">',
     '   <div class="controls">',
     '       <button class="delete-vector">Delete this force</button>',
-//  '       <button class="add-vector"><%= add_vector_label %></button>',
     '       <button class="reset">Reset Diagram</button>',
     '       <button class="undo" title="Undo"><span class="fa fa-undo" /></button>',
     '       <button class="redo" title="redo"><span class="fa fa-repeat" /></button>',
     '   </div>',
-    '</div>'
+    '</div>',
+    '</div>',
 ].join('\n'));
+
 
 FreeBodyDraw.prototype.forceVectorsFromDescriptors = function(descriptors){
     var type = descriptors[0].shortNames;
