@@ -88,9 +88,9 @@ body {
 
 .menu .vector-properties {
     display:table-cell;
-    vertical-align:middle;
     min-width:75px;
-    padding: 10px;
+    padding-left:1em;
+    padding-right:1em;
     font-size: 16px;
     line-height: 1.25;
 }
