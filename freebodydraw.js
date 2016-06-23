@@ -550,6 +550,40 @@ VectorDraw.prototype.setState = function(state) {
 };
 
 /////////////////////////////////////////////////////
+// Disable scrolling http://stackoverflow.com/a/4770179/2747370
+function preventDefault(e) {
+  e = e || window.event;
+  if (e.preventDefault)
+      e.preventDefault();
+  e.returnValue = false;  
+}
+
+function preventDefaultForScrollKeys(e) {
+    if (keys[e.keyCode]) {
+        preventDefault(e);
+        return false;
+    }
+}
+
+function disableScroll() {
+  if (window.addEventListener) // older FF
+      window.addEventListener('DOMMouseScroll', preventDefault, false);
+  window.onwheel = preventDefault; // modern standard
+  window.onmousewheel = document.onmousewheel = preventDefault; // older browsers, IE
+  window.ontouchmove  = preventDefault; // mobile
+  document.onkeydown  = preventDefaultForScrollKeys;
+}
+
+function enableScroll() {
+    if (window.removeEventListener)
+        window.removeEventListener('DOMMouseScroll', preventDefault, false);
+    window.onmousewheel = document.onmousewheel = null; 
+    window.onwheel = null; 
+    window.ontouchmove = null;  
+    document.onkeydown = null;  
+}
+
+/////////////////////////////////////////////////////
 var FreeBodyDraw = function(element_id, settings){
     settings.vectors = this.forceVectorsFromDescriptors(settings.forceDescriptors);
 
@@ -1037,6 +1071,16 @@ FreeBodyDraw.prototype.styleVectorAsInactive = function(vecIdx){
 
 FreeBodyDraw.prototype.updateButtonsStatus = function(){
     console.log("updating buttons");
+}
+
+FreeBodyDraw.prototype.onBoardDown = function(evt){
+    disableScroll();
+    VectorDraw.prototype.onBoardDown.call(this,evt);
+}
+
+FreeBodyDraw.prototype.onBoardUp = function(evt){
+    enableScroll();
+    VectorDraw.prototype.onBoardUp.call(this,evt);
 }
 
 FreeBodyDraw.prototype.getState = function(){
