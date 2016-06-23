@@ -602,6 +602,7 @@ var FreeBodyDraw = function(element_id, settings){
     this.element.on('click', '.delete-vector', this.onDeleteDown.bind(this));
     
     this.updateButtonsStatus();
+    $('.reset, .delete-vector',this.element).addClass('inactive');
 }
 // These next two lines makes FreeBodyDraw a sub-class of VectorDraw http://stackoverflow.com/a/8460616/2747370
 FreeBodyDraw.prototype = Object.create( VectorDraw.prototype );
@@ -739,6 +740,8 @@ FreeBodyDraw.prototype.setActiveFromDescription = function(){
     
     this.setSelectedFromIdx(newIdx);
     this.currentActiveVectorIdx = newIdx;
+    
+    this.updateDeleteStatus();
 }
 
 FreeBodyDraw.prototype.setSelectedFromIdx = function(vecIdx){
@@ -930,7 +933,11 @@ FreeBodyDraw.prototype.removeVector = function(idx) {
 };
 
 FreeBodyDraw.prototype.isDrawn = function(vecIdx){
-    return this.getMenuOption('vector', vecIdx)[0].hasAttribute("disabled")
+    if (vecIdx === null){
+        return null
+    } else {
+        return this.getMenuOption('vector', vecIdx)[0].hasAttribute("disabled")
+    }   
 }
 
 FreeBodyDraw.prototype.onDescriptionChange = function(){
@@ -1070,8 +1077,26 @@ FreeBodyDraw.prototype.styleVectorAsInactive = function(vecIdx){
     });
 }
 
+FreeBodyDraw.prototype.updateDeleteStatus = function(){
+    $('.delete-vector',this.element).addClass('inactive')
+    if (this.isDrawn(this.currentActiveVectorIdx)){
+        $('.delete-vector',this.element).removeClass('inactive')
+    }
+}
+
 FreeBodyDraw.prototype.updateButtonsStatus = function(){
     console.log("updating buttons");
+    var undoEmpty = this.history_stack.undo.length === 0,
+    redoEmpty = this.history_stack.redo.length === 0;
+    
+    $('.undo, .redo, .reset', this.element).removeClass('inactive');
+    if (undoEmpty){
+        $('.undo',this.element).addClass('inactive');
+    }
+    if (redoEmpty){
+        $('.redo',this.element).addClass('inactive');
+    }
+    this.updateDeleteStatus();
 }
 
 FreeBodyDraw.prototype.onBoardDown = function(evt){
@@ -1082,6 +1107,7 @@ FreeBodyDraw.prototype.onBoardDown = function(evt){
 FreeBodyDraw.prototype.onBoardUp = function(evt){
     enableScroll();
     VectorDraw.prototype.onBoardUp.call(this,evt);
+    this.updateButtonsStatus();
 }
 
 FreeBodyDraw.prototype.getState = function(){

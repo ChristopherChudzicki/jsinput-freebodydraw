@@ -49,7 +49,7 @@ body {
     margin-bottom:75px;
 }
 
-.menu .controls .inactive button {
+.menu .controls button.inactive {
     color: red;
 }
 
