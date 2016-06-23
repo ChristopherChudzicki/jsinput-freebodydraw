@@ -1096,9 +1096,6 @@ FreeBodyDraw.prototype.setState = function(state){
 }
 
 /////////////////////////////////////////////////////
-// TODO:
-// - getState and setState should track active vector
-/////////////////////////////////////////////////////
 
 var freebodydraw = new FreeBodyDraw('freebodydraw', freebodydraw_settings);
 
