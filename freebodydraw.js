@@ -935,10 +935,10 @@ FreeBodyDraw.prototype.renderVector = function(idx, coords) {
     function labelDistance(x,y){
         //sets distance of labelPoint from tip. Idea is to have a larger offset along -x axis.
         //Could be improved ... a larger offset might be nice along -y axis.
-        var L = 0.75,
+        var L = 1.0,
             a = 5;
             
-        return 0.5+L*a*(Math.abs(x)-x)/(1+a*Math.abs(x)+4*y*y);
+        return 0.5 + L*a*(Math.abs(x)-x)/(1+a*Math.abs(x)+4*y*y);
     }
 
     var line_type = (vec.type === 'vector') ? 'arrow' : vec.type;
