@@ -1202,7 +1202,7 @@ var getInput = function() {
             check: 'presence',
             expected:true,
             label: vecLabel,
-            on: vectors[vecIdx].on.long;
+            on: vectors[vecIdx].on.long
         };
         if ('presence' in answer) {
             presence_check.expected = answer.presence;
