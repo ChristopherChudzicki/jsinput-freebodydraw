@@ -713,9 +713,9 @@ FreeBodyDraw.prototype.forceVectorsFromDescriptors = function(descriptors){
                     vec.from ={};
                     vec.from.short = on[j];
                     vec.from.long = descriptors[2].longNames[j];
-                    vec.type ={};
-                    vec.type.short = on[j];
-                    vec.type.long = descriptors[2].longNames[j];
+                    vec.forceType ={};
+                    vec.forceType.short = on[j];
+                    vec.forceType.long = descriptors[2].longNames[j];
                     vectors.push(vec);
                 }
             }
@@ -1197,7 +1197,7 @@ var getInput = function() {
     _.each(expected_results, function(answer, name) {
         var vecIdx = freebodydraw.getNamedVectorIdx(name);
         var vecLabel = vectors[vecIdx].style.label || name;
-        var vecOn = vectors[vecIdx].on.long;
+        // var vecOn = vectors[vecIdx].on.long;
         var presence_check = {
             vector: name,
             check: 'presence',
