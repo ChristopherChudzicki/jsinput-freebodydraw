@@ -1189,13 +1189,12 @@ var getInput = function() {
     _.each(expected_results, function(answer, name) {
         var vecIdx = freebodydraw.getNamedVectorIdx(name);
         var vecLabel = vectors[vecIdx].style.label || name;
-        // var vecOn = vectors[vecIdx].on.long;
         var presence_check = {
             vector: name,
             check: 'presence',
             expected:true,
             label: vecLabel,
-            on: vecOn
+            on: vectors[vecIdx].on.long;
         };
         if ('presence' in answer) {
             presence_check.expected = answer.presence;
