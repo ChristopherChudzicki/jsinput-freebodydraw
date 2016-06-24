@@ -1181,8 +1181,9 @@ var getInput = function() {
     var vectors = freebodydraw.settings.vectors;
     var expected_results = freebodydraw.settings.expected_result;
     var checks = [];
+    var undrawn_checks = [];
 
-    //First check that vectors not explicitly included in expected_results are absent
+    //First, check unexpected vectors with presence:false
     _.each(vectors, function(vec, idx){
         if ( !expected_results.hasOwnProperty(vec.name) ){
             var absence_check = {
@@ -1195,8 +1196,10 @@ var getInput = function() {
             checks.push(absence_check);
         }
     });
-
-    //Now check vectors explicitly included in expected_results
+        
+    //Now add other checks
+    var drawnVectorNames = Object.keys(input.vectors);
+    
     _.each(expected_results, function(answer, name) {
         var vecIdx = freebodydraw.getNamedVectorIdx(name);
         var vecLabel = vectors[vecIdx].style.label || name;
@@ -1213,7 +1216,11 @@ var getInput = function() {
         if ('presence_errmsg' in answer) {
             presence_check.errmsg = answer.presence_errmsg;
         }
-        checks.push(presence_check);
+        if ( _.contains(drawnVectorNames, name) ){
+            checks.push(presence_check);
+        } else {
+            undrawn_checks.push(presence_check);
+        };
 
         [
             'tail', 'tail_x', 'tail_y', 'tip', 'tip_x', 'tip_y', 'coords',
@@ -1232,12 +1239,16 @@ var getInput = function() {
                 if (prop + '_errmsg' in answer) {
                     check.errmsg = answer[prop + '_errmsg']
                 }
-                checks.push(check);
+                if ( _.contains(drawnVectorNames, name) ){
+                    checks.push(check);
+                } else {
+                    undrawn_checks.push(check);
+                };
             }
         });
     });
 
-    input.checks = checks.concat(freebodydraw.settings.custom_checks);
+    input.checks = checks.concat(undrawn_checks).concat(freebodydraw.settings.custom_checks);
     
     return JSON.stringify(input);
 };
