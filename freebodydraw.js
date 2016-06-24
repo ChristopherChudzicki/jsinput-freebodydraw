@@ -608,12 +608,6 @@ FreeBodyDraw.prototype.constructor = FreeBodyDraw;
 FreeBodyDraw.prototype.template = _.template([
     '<div class="header">',
     '<div class="menu">',
-    '   <div class="vector-properties">',
-    '       <div class="vector-prop-name vector-prop-bold">',
-    '           <span>Force:</span><br>',
-    '           <span class="value">-</span>',
-    '       </div>',
-    '   </div>',
     '   <div class="controls">',
         // This must be first <select>! (Can be hidden)
     '       <select id="select-vector" class="hidden">',
@@ -663,6 +657,12 @@ FreeBodyDraw.prototype.template = _.template([
     '           </p>',
     '       </fieldset>',
     '   </div>',
+    '   <div class="vector-properties">',
+    '       <div class="vector-prop-name vector-prop-bold">',
+    '           <span>Force:</span><br>',
+    '           <span class="value">-</span>',
+    '       </div>',
+    '   </div>',
     '   <% if (show_vector_properties) { %>',
     '   <div class="vector-properties">',
 //  '       <h3><%= vector_properties_label %></h3>',
@@ -691,7 +691,6 @@ FreeBodyDraw.prototype.template = _.template([
     '</div>',
     '</div>',
 ].join('\n'));
-
 
 FreeBodyDraw.prototype.forceVectorsFromDescriptors = function(descriptors){
     var type = descriptors[0].shortNames;
