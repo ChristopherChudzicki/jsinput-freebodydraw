@@ -1,12 +1,11 @@
 body {
     box-sizing: border-box;
     font-family: Arial,sans-serif;
-    margin: 10px;
+    margin: 0px;
 }
 
 
 .jxgboard {
-    float: left;
     border: 2px solid #1f628d;
 }
 
@@ -14,18 +13,25 @@ body {
     pointer-events: none;  /* prevents cursor from turning into caret when over a label */
 }
 
+.header {
+    display:table;
+}
+.footer {
+    display:table;
+}
+
 .menu {
-    float: left;
-    width: 190px;
     margin-left: 15px;
+    display: table-row;
 }
 
 .menu .controls {
     font-size: 12;
+    display:table-cell;
 }
 
 .menu .controls select {
-    width: 115px;
+    width: 200px;
     margin-bottom: 0px;
     font-size: 18px;
 }
@@ -54,7 +60,6 @@ body {
 
 .menu .controls button.delete-vector {
     width:160px;
-    margin-bottom:75px;
 }
 
 .menu .controls button:hover:not(.inactive) {
@@ -78,9 +83,10 @@ body {
 }
 
 .menu .vector-properties {
-    width:135px;
-    padding: 10px;
-    border: 1px solid #1f628d;
+    display:table-cell;
+    min-width:75px;
+    padding-left:1em;
+    padding-right:1em;
     font-size: 16px;
     line-height: 1.25;
 }
@@ -94,8 +100,8 @@ body {
     font-weight: bold;
 }
 
-.menu .vector-prop-name {
-    height:30px;
+.menu .vector-prop-name .value {
+    font-size:150%;
 }
 
 .menu .vector-prop-slope {

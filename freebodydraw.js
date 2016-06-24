@@ -606,7 +606,7 @@ FreeBodyDraw.prototype = Object.create( VectorDraw.prototype );
 FreeBodyDraw.prototype.constructor = FreeBodyDraw;
 
 FreeBodyDraw.prototype.template = _.template([
-    '<div class="jxgboard" style="width:<%= width %>px; height:<%= height %>px;" />',
+    '<div class="header">',
     '<div class="menu">',
     '   <div class="controls">',
         // This must be first <select>! (Can be hidden)
@@ -622,13 +622,11 @@ FreeBodyDraw.prototype.template = _.template([
     '           <% }}) %>',
     '       </select>',
     '       <fieldset>',
-    '           <div class="vector-prop-name">',
-    '               <h3>Force: <span class="value vector-prop-bold">-</span></h3>',
-    '           </div>',
+    '           <legend>Select a force to draw.</legend>',
     '           <p>',
     '               <label>on: </label>',
     '               <select id="on">',
-    '                   <option disabled selected>...</option>',
+    '                   <option disabled selected>Select...</option>',
     '                   <% forceDescriptors[1].shortNames.forEach(function(val,idx) { %>',
     '                   <option value="<%=val%>"> <%= forceDescriptors[1].longNames[idx] %> </option>',
     '                   <% }) %>',
@@ -640,7 +638,7 @@ FreeBodyDraw.prototype.template = _.template([
     '           <p>',
     '               <label>from: </label>',
     '               <select id="from">',
-    '                   <option disabled selected>...</option>',
+    '                   <option disabled selected>Select...</option>',
     '                   <% forceDescriptors[2].shortNames.forEach(function(val,idx) { %>',
     '                   <option value="<%=val%>"> <%= forceDescriptors[2].longNames[idx] %> </option>',
     '                   <% }) %>',
@@ -652,7 +650,7 @@ FreeBodyDraw.prototype.template = _.template([
     '           <p>',
     '               <label>type: </label>',
     '               <select id="type">',
-    '                   <option disabled selected>...</option>',
+    '                   <option disabled selected>Select...</option>',
     '                   <% forceDescriptors[0].shortNames.forEach(function(val,idx) { %>',
     '                   <option value="<%=val%>"> <%= forceDescriptors[0].longNames[idx] %> </option>',
     '                   <% }) %>',
@@ -660,9 +658,17 @@ FreeBodyDraw.prototype.template = _.template([
     '           </p>',
     '       </fieldset>',
     '   </div>',
+    '   <div class="vector-properties">',
+    '       <br>',
+    '       <div class="vector-prop-name vector-prop-bold">',
+    '           <span>Force:</span><br>',
+    '           <span class="value">-</span>',
+    '       </div>',
+    '   </div>',
     '   <% if (show_vector_properties) { %>',
     '   <div class="vector-properties">',
 //  '       <h3><%= vector_properties_label %></h3>',
+    '       <br>',
     '       <div class="vector-prop-length">',
     '           length: <span class="value">-</span>',
     '       </div>',
@@ -674,14 +680,19 @@ FreeBodyDraw.prototype.template = _.template([
     '       </div>',
     '   </div>',
     '   <% } %>',
+    '</div>',
+    '</div>',
+    '<div class="jxgboard" style="width:<%= width %>px; height:<%= height %>px;" />',
+    '<div class="footer">',
+    '<div class="menu">',
     '   <div class="controls">',
     '       <button class="delete-vector">Delete this force</button>',
-//  '       <button class="add-vector"><%= add_vector_label %></button>',
     '       <button class="reset">Reset Diagram</button>',
     '       <button class="undo" title="Undo"><span class="fa fa-undo" /></button>',
     '       <button class="redo" title="redo"><span class="fa fa-repeat" /></button>',
     '   </div>',
-    '</div>'
+    '</div>',
+    '</div>',
 ].join('\n'));
 
 FreeBodyDraw.prototype.forceVectorsFromDescriptors = function(descriptors){
@@ -1189,13 +1200,12 @@ var getInput = function() {
     _.each(expected_results, function(answer, name) {
         var vecIdx = freebodydraw.getNamedVectorIdx(name);
         var vecLabel = vectors[vecIdx].style.label || name;
-        // var vecOn = vectors[vecIdx].on.long;
         var presence_check = {
             vector: name,
             check: 'presence',
             expected:true,
             label: vecLabel,
-            on: vecOn
+            on: vectors[vecIdx].on.long
         };
         if ('presence' in answer) {
             presence_check.expected = answer.presence;
