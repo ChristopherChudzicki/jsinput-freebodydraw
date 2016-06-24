@@ -707,6 +707,15 @@ FreeBodyDraw.prototype.forceVectorsFromDescriptors = function(descriptors){
                     vec.render = false;
                     vec.style = {};
                     vec.style.label = "<span>" + type[i] + "<sub><sub>" + on[j] + "," + from[k] + "</sub></sub>" + "</span>";
+                    vec.on ={};
+                    vec.on.short = on[j];
+                    vec.on.long = descriptors[1].longNames[j];
+                    vec.from ={};
+                    vec.from.short = on[j];
+                    vec.from.long = descriptors[2].longNames[j];
+                    vec.type ={};
+                    vec.type.short = on[j];
+                    vec.type.long = descriptors[2].longNames[j];
                     vectors.push(vec);
                 }
             }
@@ -1177,7 +1186,8 @@ var getInput = function() {
                 vector:vec.name, 
                 check:'presence',
                 expected:false, 
-                label:vec.style.label || vec.name
+                label:vec.style.label || vec.name,
+                on: vec.on.long
             }
             checks.push(absence_check);
         }
@@ -1187,11 +1197,13 @@ var getInput = function() {
     _.each(expected_results, function(answer, name) {
         var vecIdx = freebodydraw.getNamedVectorIdx(name);
         var vecLabel = vectors[vecIdx].style.label || name;
+        var vecOn = vectors[vecIdx].on.long;
         var presence_check = {
             vector: name,
             check: 'presence',
             expected:true,
-            label: vecLabel
+            label: vecLabel,
+            on: vecOn
         };
         if ('presence' in answer) {
             presence_check.expected = answer.presence;
