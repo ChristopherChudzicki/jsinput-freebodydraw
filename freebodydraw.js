@@ -1,5 +1,39 @@
 'use strict';
 
+/////////////////////////////////////////////////////
+// Disable scrolling http://stackoverflow.com/a/4770179/2747370
+function preventDefault(e) {
+  e = e || window.event;
+  if (e.preventDefault)
+      e.preventDefault();
+  e.returnValue = false;  
+}
+
+function preventDefaultForScrollKeys(e) {
+    if (keys[e.keyCode]) {
+        preventDefault(e);
+        return false;
+    }
+}
+
+function disableScroll() {
+  if (window.addEventListener) // older FF
+      window.addEventListener('DOMMouseScroll', preventDefault, false);
+  window.onwheel = preventDefault; // modern standard
+  window.onmousewheel = document.onmousewheel = preventDefault; // older browsers, IE
+  window.ontouchmove  = preventDefault; // mobile
+  document.onkeydown  = preventDefaultForScrollKeys;
+}
+
+function enableScroll() {
+    if (window.removeEventListener)
+        window.removeEventListener('DOMMouseScroll', preventDefault, false);
+    window.onmousewheel = document.onmousewheel = null; 
+    window.onwheel = null; 
+    window.ontouchmove = null;  
+    document.onkeydown = null;  
+}
+
 var VectorDraw = function(element_id, settings) {
     this.board = null;
     this.dragged_vector = null;
@@ -468,6 +502,7 @@ VectorDraw.prototype.onBoardDown = function(evt) {
         var point_coords = [coords.usrCoords[1], coords.usrCoords[2]];
         if (selected.type === 'vector') {
             this.drawMode = true;
+            disableScroll();
             this.dragged_vector = this.renderVector(selected.idx, [point_coords, point_coords]);
         } else {
             this.renderPoint(selected.idx, point_coords);
@@ -495,6 +530,7 @@ VectorDraw.prototype.onBoardMove = function(evt) {
 };
 
 VectorDraw.prototype.onBoardUp = function(evt) {
+    enableScroll();
     this.drawMode = false;
     if (this.dragged_vector && !this.isVectorTailDraggable(this.dragged_vector)) {
         this.dragged_vector.point1.setProperty({fixed: true});
@@ -549,39 +585,6 @@ VectorDraw.prototype.setState = function(state) {
     this.board.update();
 };
 
-/////////////////////////////////////////////////////
-// Disable scrolling http://stackoverflow.com/a/4770179/2747370
-function preventDefault(e) {
-  e = e || window.event;
-  if (e.preventDefault)
-      e.preventDefault();
-  e.returnValue = false;  
-}
-
-function preventDefaultForScrollKeys(e) {
-    if (keys[e.keyCode]) {
-        preventDefault(e);
-        return false;
-    }
-}
-
-function disableScroll() {
-  if (window.addEventListener) // older FF
-      window.addEventListener('DOMMouseScroll', preventDefault, false);
-  window.onwheel = preventDefault; // modern standard
-  window.onmousewheel = document.onmousewheel = preventDefault; // older browsers, IE
-  window.ontouchmove  = preventDefault; // mobile
-  document.onkeydown  = preventDefaultForScrollKeys;
-}
-
-function enableScroll() {
-    if (window.removeEventListener)
-        window.removeEventListener('DOMMouseScroll', preventDefault, false);
-    window.onmousewheel = document.onmousewheel = null; 
-    window.onwheel = null; 
-    window.ontouchmove = null;  
-    document.onkeydown = null;  
-}
 
 /////////////////////////////////////////////////////
 var FreeBodyDraw = function(element_id, settings){
@@ -1137,13 +1140,7 @@ FreeBodyDraw.prototype.updateButtonsStatus = function(){
     this.updateDeleteStatus();
 }
 
-FreeBodyDraw.prototype.onBoardDown = function(evt){
-    disableScroll();
-    VectorDraw.prototype.onBoardDown.call(this,evt);
-}
-
 FreeBodyDraw.prototype.onBoardUp = function(evt){
-    enableScroll();
     VectorDraw.prototype.onBoardUp.call(this,evt);
     this.updateButtonsStatus();
 }
