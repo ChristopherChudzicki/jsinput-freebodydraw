@@ -1140,6 +1140,16 @@ FreeBodyDraw.prototype.updateButtonsStatus = function(){
     this.updateDeleteStatus();
 }
 
+FreeBodyDraw.prototype.objectsUnderMouse = function(){
+    var targetObjects = [];
+    var highlightedObjects = this.board.highlightedObjects
+    var keys = Object.keys(highlightedObjects);
+    for (var i = 0; i < keys.length; i++) {
+        targetObjects.push( highlightedObjects[keys[i]] );
+    }
+    return targetObjects
+}
+
 FreeBodyDraw.prototype.onBoardUp = function(evt){
     VectorDraw.prototype.onBoardUp.call(this,evt);
     this.updateButtonsStatus();
