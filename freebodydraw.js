@@ -690,8 +690,8 @@ FreeBodyDraw.prototype.template = _.template([
     '<div class="footer">',
     '<div class="menu">',
     '   <div class="controls">',
-    '       <button class="delete-vector">Delete this force</button>',
-    '       <button class="reset">Reset Diagram</button>',
+    '       <button class="delete-vector">Delete</button>',
+    '       <button class="reset">Reset</button>',
     '       <button class="undo" title="Undo"><span class="fa fa-undo" /></button>',
     '       <button class="redo" title="redo"><span class="fa fa-repeat" /></button>',
     '   </div>',
@@ -1203,6 +1203,7 @@ FreeBodyDraw.prototype.getInput = function(){
     
     _.each(expected_results, function(answer, name) {
         var vecIdx = this.getNamedVectorIdx(name);
+        console.log(name,vecIdx)
         var vecLabel = vectors[vecIdx].style.label || name;
         var presence_check = {
             vector: name,
