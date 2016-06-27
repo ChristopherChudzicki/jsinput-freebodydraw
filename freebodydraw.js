@@ -600,7 +600,8 @@ var FreeBodyDraw = function(element_id, settings){
     
     this.element.on('change', '#type',this.onDescriptionChange.bind(this));
     this.element.on('change', '#on',this.onDescriptionChange.bind(this));
-    this.element.on('change', '#from',this.onDescriptionChange.bind(this)); 
+    this.element.on('change', '#from',this.onDescriptionChange.bind(this));
+    this.element.on('keydown',this.onKeyDown.bind(this));
     
     this.element.on('click', '.delete-vector', this.onDeleteDown.bind(this));
 }
@@ -1153,6 +1154,12 @@ FreeBodyDraw.prototype.objectsUnderMouse = function(){
 FreeBodyDraw.prototype.onBoardUp = function(evt){
     VectorDraw.prototype.onBoardUp.call(this,evt);
     this.updateButtonsStatus();
+}
+
+FreeBodyDraw.prototype.onKeyDown = function(evt){
+    if (evt.which===8){ //Backspace key
+        this.onDeleteDown();
+    } 
 }
 
 FreeBodyDraw.prototype.getState = function(){
