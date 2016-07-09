@@ -690,8 +690,8 @@ FreeBodyDraw.prototype.template = _.template([
     '<div class="footer">',
     '<div class="menu">',
     '   <div class="controls">',
-    '       <button class="delete-vector">Delete this force</button>',
-    '       <button class="reset">Reset Diagram</button>',
+    '       <button class="delete-vector">Delete</button>',
+    '       <button class="reset">Reset</button>',
     '       <button class="undo" title="Undo"><span class="fa fa-undo" /></button>',
     '       <button class="redo" title="redo"><span class="fa fa-repeat" /></button>',
     '   </div>',
@@ -1175,25 +1175,12 @@ FreeBodyDraw.prototype.setState = function(state){
     this.updateButtonsStatus();
 }
 
-/////////////////////////////////////////////////////
-
-var freebodydraw = new FreeBodyDraw('freebodydraw', freebodydraw_settings);
-
-var getState = function() {
-    var state = freebodydraw.getState();
-    return JSON.stringify(state);
-};
-
-var setState = function(serialized) {
-    freebodydraw.setState(JSON.parse(serialized));
-};
-
-var getInput = function() {
-    var input = freebodydraw.getState();
+FreeBodyDraw.prototype.getInput = function(){
+    var input = this.getState();
     
     // Transform the expected_result setting into a list of checks.
-    var vectors = freebodydraw.settings.vectors;
-    var expected_results = freebodydraw.settings.expected_result;
+    var vectors = this.settings.vectors;
+    var expected_results = this.settings.expected_result;
     var checks = [];
     var undrawn_checks = [];
 
@@ -1215,7 +1202,8 @@ var getInput = function() {
     var drawnVectorNames = Object.keys(input.vectors);
     
     _.each(expected_results, function(answer, name) {
-        var vecIdx = freebodydraw.getNamedVectorIdx(name);
+        var vecIdx = this.getNamedVectorIdx(name);
+        console.log(name,vecIdx)
         var vecLabel = vectors[vecIdx].style.label || name;
         var presence_check = {
             vector: name,
@@ -1260,9 +1248,27 @@ var getInput = function() {
                 };
             }
         });
-    });
+    },this);
 
-    input.checks = checks.concat(undrawn_checks).concat(freebodydraw.settings.custom_checks);
+    input.checks = checks.concat(undrawn_checks).concat(this.settings.custom_checks);
     
-    return JSON.stringify(input);
-};
+    return input
+}
+
+/////////////////////////////////////////////////////
+
+// var freebodydraw = new FreeBodyDraw('freebodydraw', freebodydraw_settings);
+//
+// var getState = function() {
+//     var state = freebodydraw.getState();
+//     return JSON.stringify(state);
+// };
+//
+// var setState = function(serialized) {
+//     freebodydraw.setState(JSON.parse(serialized));
+// };
+//
+// var getInput = function() {
+//     var input = freebodydraw.getInput();
+//     return JSON.stringify(input);
+// };

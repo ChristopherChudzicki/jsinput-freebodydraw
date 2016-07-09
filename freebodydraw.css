@@ -33,7 +33,7 @@ body {
 }
 
 .menu .controls select {
-    width: 200px;
+    width: 150px;
     margin-bottom: 0px;
     font-size: 18px;
 }
@@ -48,7 +48,7 @@ body {
     margin: 4px 0;
     border: 2px solid #1f628d;
     text-decoration: none;
-    width: 160px;
+    width: 75px;
 }
 
 .menu.controls button:not(.inactive){
@@ -58,10 +58,6 @@ body {
 .menu .controls button.inactive {
     background: #B6CEDE;
     border-color:#97B0BF;
-}
-
-.menu .controls button.delete-vector {
-    width:160px;
 }
 
 .menu .controls button:hover:not(.inactive) {
@@ -77,7 +73,7 @@ body {
 
 .menu .controls button.undo,
 .menu .controls button.redo {
-    width: 75px;
+    width: 50px;
 }
 
 .menu .controls button.undo {
