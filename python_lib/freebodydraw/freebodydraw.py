@@ -34,8 +34,8 @@ def _errmsg_point(default_message, check, point):
 def check_presence(check, vectors):
     if check['vector'] not in vectors and check['expected']:
         # errmsg = check.get('errmsg', 'You need to use the {label} vector.')
-        errmsg = check.get('errmsg', "What you've drawn so far is correct, but you're missing some force(s) acting on {onObj}.")
-        return errmsg.format(label=check['label'],onObj=check['on'])
+        errmsg = check.get('errmsg', "What you've drawn so far is correct, but you're missing some force(s) acting on {forceOn}.")
+        return errmsg.format(label=check['label'],forceOn=check['on'])
     if check['vector'] in vectors and not check['expected']:
         forceOn=check['on']
         forceType = check['type']
