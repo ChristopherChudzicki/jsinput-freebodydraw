@@ -248,7 +248,11 @@ class Grader(object):
             args = [check_data[arg] for arg in inspect.getargspec(check_fn).args]
             result = check_fn(*args)
             if result:
-                return {'ok': False, 'msg': result}
+                ok = False
+                grade_decimal = 0
+                if 'so far is correct' in result:
+                    ok = 'Partial'
+                return {'ok': ok, 'msg': result, 'grade_decimal':grade_decimal}
         return {'ok': True, 'msg': self.success_message}
 
     def cfn(self, e, ans):
