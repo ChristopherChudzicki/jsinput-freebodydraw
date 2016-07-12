@@ -1202,7 +1202,6 @@ FreeBodyDraw.prototype.getInput = function(){
         
     //Now add other checks
     var drawnVectorNames = Object.keys(input.vectors);
-    
     _.each(expected_results, function(answer, name) {
         var vecIdx = this.getNamedVectorIdx(name);
         var vec = vectors[vecIdx];
@@ -1222,6 +1221,9 @@ FreeBodyDraw.prototype.getInput = function(){
         if ('presence_errmsg' in answer) {
             presence_check.errmsg = answer.presence_errmsg;
         }
+        if (drawnVectorNames.length === 0){
+            presence_check.errmsg = "Please select a force and begin drawing your free-body diagram."
+        }
         if ( _.contains(drawnVectorNames, name) ){
             checks.push(presence_check);
         } else {
@@ -1229,7 +1231,7 @@ FreeBodyDraw.prototype.getInput = function(){
         };
 
         [
-            'tail', 'tail_x', 'tail_y', 'tip', 'tip_x', 'tip_y', 'coords',
+            'min_length', 'tail', 'tail_x', 'tail_y', 'tip', 'tip_x', 'tip_y', 'coords',
             'length', 'angle', 'segment_angle', 'segment_coords', 'points_on_line'
         ].forEach(function(prop) {
             if (prop in answer) {

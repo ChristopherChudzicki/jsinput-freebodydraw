@@ -39,7 +39,7 @@ def check_presence(check, vectors):
         forceFrom = check['from']
         label = check['label']
         if forceType.lower() == 'gravitational':
-            errmsg = check.get('errmsg', "Regarding {label}: The gravitational attraction between {forceFrom} and {forceOn} is negligible in comparison to other forces in this problem. Let's ignore it. ")
+            errmsg = check.get('errmsg', "Regarding {label}: The gravitational attraction between {forceFrom} and {forceOn} is negligible in comparison to other forces in this problem. Let's ignore it.")
         else:
             errmsg = check.get('errmsg', "Regarding {label}: {forceFrom} does not exert a {forceType} force on {forceOn}.")
         return errmsg.format(label=label,forceOn=forceOn,forceFrom=forceFrom,forceType=forceType)
@@ -138,7 +138,7 @@ def check_angle(check, vectors):
     tolerance = check.get('tolerance', 2.0)
     expected = math.radians(check['expected'])
     if not _angle_within_tolerance(vec, expected, tolerance):
-        return _errmsg('The angle of {label} is incorrect. Your angle: {angle:.1f}', check, vectors)
+        return _errmsg('The direction of force {label} is incorrect.', check, vectors)
 
 def check_segment_angle(check, vectors):
     # Segments are not directed, so we must check the angle between the segment and
