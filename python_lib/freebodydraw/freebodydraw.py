@@ -34,8 +34,15 @@ def check_presence(check, vectors):
         errmsg = check.get('errmsg', "What you've drawn so far is correct, but you're missing some force(s) acting on {onObj}.")
         return errmsg.format(label=check['label'],onObj=check['on'])
     if check['vector'] in vectors and not check['expected']:
-        errmsg = check.get('errmsg', 'You should not use the {label} vector.')
-        return errmsg.format(label=check['label'])
+        forceOn=check['on']
+        forceType = check['type']
+        forceFrom = check['from']
+        label = check['label']
+        if forceType.lower() == 'gravitational':
+            errmsg = check.get('errmsg', "Regarding {label}: The gravitational attraction between {forceFrom} and {forceOn} is negligible in comparison to other forces in this problem. Let's ignore it. ")
+        else:
+            errmsg = check.get('errmsg', "Regarding {label}: {forceFrom} does not exert a {forceType} force on {forceOn}.")
+        return errmsg.format(label=label,forceOn=forceOn,forceFrom=forceFrom,forceType=forceType)
 def check_min_length(check, vectors):
     vec = vectors[check['vector']]
     if vec.length < check['expected']:

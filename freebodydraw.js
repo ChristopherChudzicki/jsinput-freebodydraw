@@ -714,15 +714,15 @@ FreeBodyDraw.prototype.forceVectorsFromDescriptors = function(descriptors){
                     vec.render = false;
                     vec.style = {};
                     vec.style.label = "<span>" + type[i] + "<sub>" + on[j] + "," + from[k] + "</sub>" + "</span>";
+                    vec.forceType ={};
+                    vec.forceType.short = type[i];
+                    vec.forceType.long = descriptors[0].longNames[i];
                     vec.on ={};
                     vec.on.short = on[j];
                     vec.on.long = descriptors[1].longNames[j];
                     vec.from ={};
-                    vec.from.short = on[j];
-                    vec.from.long = descriptors[2].longNames[j];
-                    vec.forceType ={};
-                    vec.forceType.short = on[j];
-                    vec.forceType.long = descriptors[2].longNames[j];
+                    vec.from.short = from[k];
+                    vec.from.long = descriptors[2].longNames[k];
                     vectors.push(vec);
                 }
             }
@@ -1192,7 +1192,9 @@ FreeBodyDraw.prototype.getInput = function(){
                 check:'presence',
                 expected:false, 
                 label:vec.style.label || vec.name,
-                on: vec.on.long
+                on: vec.on.long,
+                from: vec.from.long,
+                type: vec.forceType.long
             }
             checks.push(absence_check);
         }
@@ -1203,14 +1205,16 @@ FreeBodyDraw.prototype.getInput = function(){
     
     _.each(expected_results, function(answer, name) {
         var vecIdx = this.getNamedVectorIdx(name);
-        console.log(name,vecIdx)
-        var vecLabel = vectors[vecIdx].style.label || name;
+        var vec = vectors[vecIdx];
+        var vecLabel = vec.style.label || name;
         var presence_check = {
             vector: name,
             check: 'presence',
             expected:true,
             label: vecLabel,
-            on: vectors[vecIdx].on.long
+            on: vec.on.long,
+            from: vec.from.long,
+            type: vec.forceType.long
         };
         if ('presence' in answer) {
             presence_check.expected = answer.presence;
