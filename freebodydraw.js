@@ -1239,7 +1239,10 @@ FreeBodyDraw.prototype.getInput = function(){
                     vector: name, 
                     check: prop,
                     expected: answer[prop],
-                    label: vecLabel
+                    label: vecLabel,
+                    on: vec.on.long,
+                    from: vec.from.long,
+                    type: vec.forceType.long
                 };
                 if (prop + '_tolerance' in answer) {
                     check.tolerance = answer[prop + '_tolerance'];

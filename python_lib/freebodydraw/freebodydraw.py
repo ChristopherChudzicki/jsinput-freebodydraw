@@ -17,6 +17,9 @@ def _errmsg(default_message, check, vectors):
     vec = vectors[check['vector']]
     return template.format(name=vec.name,
                            label = check['label'],
+                           forceOn = check['on'],
+                           forceFrom = check['from'],
+                           forceType = check['type'],
                            tail_x=vec.tail.x,
                            tail_y=vec.tail.y,
                            tip_x=vec.tip.x,
@@ -39,7 +42,7 @@ def check_presence(check, vectors):
         forceFrom = check['from']
         label = check['label']
         if forceType.lower() == 'gravitational':
-            errmsg = check.get('errmsg', "Regarding {label}: The gravitational attraction between {forceFrom} and {forceOn} is negligible in comparison to other forces in this problem. Let's ignore it.")
+            errmsg = check.get('errmsg', "The gravitational attraction between {forceFrom} and {forceOn} is negligible in comparison to other forces in this problem. Let's ignore the force {label}.")
         else:
             errmsg = check.get('errmsg', "Regarding {label}: {forceFrom} does not exert a {forceType} force on {forceOn}.")
         return errmsg.format(label=label,forceOn=forceOn,forceFrom=forceFrom,forceType=forceType)
@@ -137,7 +140,23 @@ def check_angle(check, vectors):
     vec = vectors[check['vector']]
     tolerance = check.get('tolerance', 2.0)
     expected = math.radians(check['expected'])
-    if not _angle_within_tolerance(vec, expected, tolerance):
+    angle_ok = _angle_within_tolerance(vec, expected, tolerance)
+    angle_opposite = _angle_within_tolerance(vec, expected+math.pi, tolerance)
+    is_normal_force = "normal" in check['type'].lower()
+    is_friction = "friction" in check['type'].lower()
+    is_kinetic_friction_force = "kinetic" in check['type'].lower()
+    is_static_friction_force = "static" in check['type'].lower()
+    if angle_ok:
+        return None
+    elif is_normal_force and not angle_ok and not angle_opposite:
+        return _errmsg('The normal force {label} you drew does not have the correct direction. <br><br> Reminder:  normal forces always act perpendicular ("normal") to the surfaces of the interacting objects.', check, vectors)
+    elif is_friction and not angle_ok and not angle_opposite:
+        return _errmsg('The normal force {label} you drew does not have the correct direction. <br><br> Reminder:  friction forces always act parallel to the surfaces of the interacting objects.', check, vectors)
+    elif is_kinetic_friction_force and not angle_ok:
+        return _errmsg('The kinetic friction force {label} you drew does not have the correct direction. <br><br> Reminder: a kinetic friction force on {forceOn} from {forceFrom} always acts to <strong>opposite the relative motion</strong> of these objects.', check, vectors)
+    elif is_static_friction_force and not angle_ok:
+        return _errmsg('The static friction force {label} you drew does not have the correct direction. <br><br> Reminder: static friction acts to <strong>prevent relative motion</strong>. What direction does {label} need to point in order to prevent relation motion between {forceOn} and {forceFrom}?', check, vectors)
+    else:
         return _errmsg('The direction of force {label} is incorrect.', check, vectors)
 
 def check_segment_angle(check, vectors):
