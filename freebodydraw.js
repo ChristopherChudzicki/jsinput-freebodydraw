@@ -1232,7 +1232,7 @@ FreeBodyDraw.prototype.getInput = function(){
 
         [
             'min_length', 'tail', 'tail_x', 'tail_y', 'tip', 'tip_x', 'tip_y', 'coords',
-            'length', 'angle', 'segment_angle', 'segment_coords', 'points_on_line'
+            'length', 'angle_not', 'angle', 'segment_angle', 'segment_coords', 'points_on_line'
         ].forEach(function(prop) {
             if (prop in answer) {
                 var check = {

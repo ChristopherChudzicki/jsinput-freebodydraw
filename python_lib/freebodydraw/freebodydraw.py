@@ -159,6 +159,13 @@ def check_angle(check, vectors):
     else:
         return _errmsg('The direction of force {label} is incorrect.', check, vectors)
 
+def check_angle_not(check,vectors):
+    vec = vectors[check['vector']]
+    tolerance = check.get('tolerance', 2.0)
+    expected = math.radians(check['expected'])
+    if _angle_within_tolerance(vec, expected, tolerance):
+        return _errmsg('The force {label} should not have angle {angle}', check, vectors)
+
 def check_segment_angle(check, vectors):
     # Segments are not directed, so we must check the angle between the segment and
     # the vector that represents it, as well as its opposite vector.
@@ -225,6 +232,7 @@ class Grader(object):
         'tip_y': check_tip_y,
         'coords': check_coords,
         'length': check_length,
+        'angle_not': check_angle_not,
         'angle': check_angle,
         'segment_angle': check_segment_angle,
         'segment_coords': check_segment_coords,
