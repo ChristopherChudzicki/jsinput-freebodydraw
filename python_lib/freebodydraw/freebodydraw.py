@@ -240,7 +240,7 @@ class Grader(object):
         'point_coords': check_point_coords,
     }
 
-    def __init__(self, success_message='Test passed', custom_checks=None):
+    def __init__(self, success_message="Your free-body diagram seems correct!. Still, we recommend you compare your drawing to the solution.", custom_checks=None):
         self.success_message = success_message
         if custom_checks:
             self.check_registry.update(custom_checks)
