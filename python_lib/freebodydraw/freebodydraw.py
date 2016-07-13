@@ -44,7 +44,7 @@ def check_presence(check, vectors):
         if forceType.lower() == 'gravitational':
             errmsg = check.get('errmsg', "The gravitational attraction between {forceFrom} and {forceOn} is negligible in comparison to other forces in this problem. Let's agree not to include the force {label}.")
         else:
-            errmsg = check.get('errmsg', "Regarding {label}: {forceFrom} does not exert a {forceType} force on {forceOn}.")
+            errmsg = check.get('errmsg', "{forceFrom} does not exert a {forceType} force on {forceOn}. We should not include force {label}.")
         return errmsg.format(label=label,forceOn=forceOn,forceFrom=forceFrom,forceType=forceType)
 def check_min_length(check, vectors):
     vec = vectors[check['vector']]
