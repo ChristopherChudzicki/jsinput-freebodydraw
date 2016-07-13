@@ -42,7 +42,7 @@ def check_presence(check, vectors):
         forceFrom = check['from']
         label = check['label']
         if forceType.lower() == 'gravitational':
-            errmsg = check.get('errmsg', "The gravitational attraction between {forceFrom} and {forceOn} is negligible in comparison to other forces in this problem. Let's ignore the force {label}.")
+            errmsg = check.get('errmsg', "The gravitational attraction between {forceFrom} and {forceOn} is negligible in comparison to other forces in this problem. Let's agree not to include the force {label}.")
         else:
             errmsg = check.get('errmsg', "Regarding {label}: {forceFrom} does not exert a {forceType} force on {forceOn}.")
         return errmsg.format(label=label,forceOn=forceOn,forceFrom=forceFrom,forceType=forceType)
