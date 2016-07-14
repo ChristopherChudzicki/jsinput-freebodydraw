@@ -37,7 +37,7 @@ Free-body drawing exercises with JSInput. A modification of the [jsinput-vectord
     1. Nothing drawn
     2. Negligible graviational forces
     3. Normal forces drawn not normal to surface
-    4. Friction forces drawn not normal to surface
+    4. Friction forces drawn not parallel to surface
     5. Static friction pointing opposite direction
     6. Kinetic friction pointing opposite direction
 12. Examples: use [cfn_tools](https://github.com/ChristopherChudzicki/cfn_tools) to pretty-format error messages
