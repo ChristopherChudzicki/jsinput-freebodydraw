@@ -121,7 +121,7 @@ These vector names are used for grading purposes.
 The `expected_result` setting defines vector properties for
 grading. Vectors omitted from the `expected_result` are required to be undrawn during grading. These are the supported properties:
 
-1. `min_length`: Expected minimum length
+1. `min_length`: Expected minimum length (a small value of `min_length` is added by default for all vectors that should be drawn).
 2. `tail`: Expected coordinates of the tail position, for example `[0, 1.5]`.
 3. `tail_x`, `tail_y`: Use these instead of `tail` when you are only interested in one of the coordinates, but not both.
 4. `tip`: Expected coordinates of the tip position.
@@ -165,14 +165,14 @@ There is one additional builtin check not listed above: `presence`, which can ta
 * `presence:false` is automatically chcecked for all vectors that **are not** listed within `expected_results`
 * `presence:true` is automatically checked for all vectors that **are** listed in `expected_results`
 
-You can also use `presence` in expected results to override the default error messages.
+You can also use `presence:true` or `presence:false` in expected results to override the default error messages.
 
 #### cusotm_checks
 
 The `custom_checks` property can be useful for more complex checks
 that can't be specified using the `expected_result` entry alone.
 When using custom checks, the pyton grading code for each custom check
-needs to be defined in the problem XML.
+needs to be defined in the problem XML. See [jsinput-vectordraw](https://github.com/open-craft/jsinput-vectordraw) for details.
 
 #### Grading Order
 The grading philosophy for `freebodydraw` is to first checking that everything drawn so far is correct, then check whether anything is missing. In particular, the check order is:
