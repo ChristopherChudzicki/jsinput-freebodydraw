@@ -1,0 +1,36 @@
+<problem>
+<script type="text/python">
+<![CDATA[
+import python_lib.cfn_tools as cfn_tools
+import python_lib.freebodydraw as freebodydraw
+
+grader = freebodydraw.Grader()
+
+#cfn = cfn_tools.debugger
+cfn = grader.cfn
+pretty_settings = {'Partial':{'label':'Correct So Far', 'color':'navy'}}
+cfn = cfn_tools.pretty(cfn,settings=pretty_settings)
+]]>
+</script>
+
+<p>A block is sitting at rest on a \(20^{\circ}\) incline.</p>
+
+<image style="width:300px;display:block;margin-left:auto;margin-right:auto" src="/static/block_resting_on_incline_setup.svg"></image>
+
+<p>Draw a free-body diagram for this block.</p>
+<ul style="padding-left:4em">
+    <li><em>Focus on drawing the correct forces at roughly the correct angles. Angles do not need to be exact, and we are not picky about vector lengths.</em></li>
+    <li><em>Make sure that force vectors start with their tails near the appropriate object.</em></li>
+</ul>
+
+<customresponse cfn="cfn">
+  <jsinput gradefn="getInput"
+    get_statefn="getState"
+    set_statefn="setState"
+    initial_state='{}'
+    width="660"
+    height="500"
+    html_file="/static/block_resting_on_incline_FBD.html"
+    />
+</customresponse>
+</problem>

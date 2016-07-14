@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:ns0="http://www.iki.fi/pav/software/textext/"
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="650"
+   height="350"
+   viewBox="0 0 650.00001 350.00001"
+   id="svg6330"
+   version="1.1"
+   inkscape:version="0.91 r13725"
+   sodipodi:docname="block_resting_on_incline_FBD.svg">
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.98994949"
+     inkscape:cx="145.02019"
+     inkscape:cy="166.72666"
+     inkscape:document-units="px"
+     inkscape:current-layer="g4165"
+     showgrid="false"
+     inkscape:window-width="2560"
+     inkscape:window-height="1217"
+     inkscape:window-x="0"
+     inkscape:window-y="1"
+     inkscape:window-maximized="1"
+     units="px" />
+  <defs
+     id="defs6332" />
+  <metadata
+     id="metadata6335">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     id="layer1"
+     inkscape:groupmode="layer"
+     inkscape:label="Layer 1"
+     transform="translate(0,-702.36218)">
+    <g
+       id="g4165"
+       transform="translate(0,14)">
+      <g
+         id="g4167"
+         transform="translate(100,34.644826)">
+        <g
+           id="g6921"
+           transform="matrix(0.93969262,-0.34202014,0.34202014,0.93969262,-283.63621,18.60223)">
+          <g
+             transform="matrix(0.93969262,-0.34202014,0.34202014,0.93969262,-319.74263,146.77502)"
+             id="g4159">
+            <g
+               id="g7065"
+               transform="matrix(0.93969262,0.34202014,-0.34202014,0.93969262,308.69707,123.44161)">
+              <g
+                 id="g6914"
+                 transform="translate(-2.1428571,105.35714)">
+                <rect
+                   style="fill:#d3bc5f;fill-opacity:1;fill-rule:nonzero;stroke:#504416;stroke-width:1"
+                   id="rect5324"
+                   width="49"
+                   height="28.999996"
+                   x="171.22339"
+                   y="643.74518" />
+              </g>
+            </g>
+            <circle
+               style="fill:#000000;stroke:none;stroke-width:2;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0"
+               id="path6919"
+               cx="229.4359"
+               cy="907.20154"
+               r="8" />
+          </g>
+        </g>
+        <path
+           sodipodi:nodetypes="cccc"
+           inkscape:connector-curvature="0"
+           id="path6878"
+           d="m 112.67344,870.24915 224.32634,0 0,-82.84593 z"
+           style="opacity:0.5;fill:#dbdbe3;fill-rule:evenodd;stroke:#000000;stroke-width:0.99999994px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+        <path
+           sodipodi:open="true"
+           d="m 167.79741,849.36433 a 58.657982,61.063122 0 0 1 3.53751,20.88482"
+           sodipodi:end="0"
+           sodipodi:start="5.9341195"
+           sodipodi:ry="61.063122"
+           sodipodi:rx="58.657982"
+           sodipodi:cy="870.24915"
+           sodipodi:cx="112.67693"
+           sodipodi:type="arc"
+           id="path6927"
+           style="fill:none;stroke:#000000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:2, 4;stroke-dashoffset:0" />
+        <g
+           id="g6941"
+           ns0:preamble=""
+           ns0:text="$20^{\\circ}$"
+           transform="matrix(1.25,0,0,1.25,-105.95673,695.60974)">
+          <defs
+             id="defs6943">
+            <g
+               id="g6945">
+              <symbol
+                 style="overflow:visible"
+                 id="textext-14758656-0"
+                 overflow="visible">
+                <path
+                   inkscape:connector-curvature="0"
+                   id="path6948"
+                   d=""
+                   style="stroke:none" />
+              </symbol>
+              <symbol
+                 style="overflow:visible"
+                 id="textext-14758656-1"
+                 overflow="visible">
+                <path
+                   inkscape:connector-curvature="0"
+                   id="path6951"
+                   d="m 1.265625,-0.765625 1.0625,-1.03125 c 1.546875,-1.375 2.140625,-1.90625 2.140625,-2.90625 0,-1.140625 -0.890625,-1.9375 -2.109375,-1.9375 -1.125,0 -1.859375,0.921875 -1.859375,1.8125 0,0.546875 0.5,0.546875 0.53125,0.546875 0.171875,0 0.515625,-0.109375 0.515625,-0.53125 0,-0.25 -0.1875,-0.515625 -0.53125,-0.515625 -0.078125,0 -0.09375,0 -0.125,0.015625 0.21875,-0.65625 0.765625,-1.015625 1.34375,-1.015625 0.90625,0 1.328125,0.8125 1.328125,1.625 C 3.5625,-3.90625 3.078125,-3.125 2.515625,-2.5 l -1.90625,2.125 C 0.5,-0.265625 0.5,-0.234375 0.5,0 l 3.703125,0 0.265625,-1.734375 -0.234375,0 C 4.171875,-1.4375 4.109375,-1 4,-0.84375 3.9375,-0.765625 3.28125,-0.765625 3.0625,-0.765625 Z m 0,0"
+                   style="stroke:none" />
+              </symbol>
+              <symbol
+                 style="overflow:visible"
+                 id="textext-14758656-2"
+                 overflow="visible">
+                <path
+                   inkscape:connector-curvature="0"
+                   id="path6954"
+                   d="m 4.578125,-3.1875 c 0,-0.796875 -0.046875,-1.59375 -0.390625,-2.328125 -0.453125,-0.96875 -1.28125,-1.125 -1.6875,-1.125 -0.609375,0 -1.328125,0.265625 -1.75,1.1875 -0.3125,0.6875 -0.359375,1.46875 -0.359375,2.265625 0,0.75 0.03125,1.640625 0.453125,2.40625 0.421875,0.796875 1.15625,1 1.640625,1 0.53125,0 1.296875,-0.203125 1.734375,-1.15625 0.3125,-0.6875 0.359375,-1.46875 0.359375,-2.25 z M 2.484375,0 C 2.09375,0 1.5,-0.25 1.328125,-1.203125 1.21875,-1.796875 1.21875,-2.71875 1.21875,-3.3125 c 0,-0.640625 0,-1.296875 0.078125,-1.828125 0.1875,-1.1875 0.9375,-1.28125 1.1875,-1.28125 0.328125,0 0.984375,0.1875 1.171875,1.171875 0.109375,0.5625 0.109375,1.3125 0.109375,1.9375 0,0.75 0,1.421875 -0.109375,2.0625 C 3.5,-0.296875 2.9375,0 2.484375,0 Z m 0,0"
+                   style="stroke:none" />
+              </symbol>
+              <symbol
+                 style="overflow:visible"
+                 id="textext-14758656-3"
+                 overflow="visible">
+                <path
+                   inkscape:connector-curvature="0"
+                   id="path6957"
+                   d=""
+                   style="stroke:none" />
+              </symbol>
+              <symbol
+                 style="overflow:visible"
+                 id="textext-14758656-4"
+                 overflow="visible">
+                <path
+                   inkscape:connector-curvature="0"
+                   id="path6960"
+                   d="m 3.53125,-1.734375 c 0,-0.84375 -0.671875,-1.5 -1.5,-1.5 -0.828125,0 -1.5,0.671875 -1.5,1.484375 0,0.84375 0.6875,1.5 1.5,1.5 0.84375,0 1.5,-0.671875 1.5,-1.484375 z m -1.5,1.140625 C 1.375,-0.59375 0.875,-1.125 0.875,-1.734375 c 0,-0.65625 0.515625,-1.171875 1.15625,-1.171875 0.65625,0 1.15625,0.53125 1.15625,1.15625 0,0.65625 -0.515625,1.15625 -1.15625,1.15625 z m 0,0"
+                   style="stroke:none" />
+              </symbol>
+            </g>
+          </defs>
+          <g
+             id="textext-14758656-5">
+            <g
+               id="g6963"
+               style="fill:#000000;fill-opacity:1">
+              <use
+                 height="100%"
+                 width="100%"
+                 id="use6965"
+                 y="134.765"
+                 x="223.43201"
+                 xlink:href="#textext-14758656-1" />
+              <use
+                 height="100%"
+                 width="100%"
+                 id="use6967"
+                 y="134.765"
+                 x="228.4133"
+                 xlink:href="#textext-14758656-2" />
+            </g>
+            <g
+               id="g6969"
+               style="fill:#000000;fill-opacity:1">
+              <use
+                 height="100%"
+                 width="100%"
+                 id="use6971"
+                 y="131.149"
+                 x="233.395"
+                 xlink:href="#textext-14758656-4" />
+            </g>
+          </g>
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,32 @@
+<problem>
+<script type="text/python">
+<![CDATA[
+import python_lib.cfn_tools as cfn_tools
+import python_lib.freebodydraw as freebodydraw
+
+grader = freebodydraw.Grader()
+
+#cfn = cfn_tools.debugger
+cfn = grader.cfn
+pretty_settings = {'Partial':{'label':'Correct So Far', 'color':'navy'}}
+cfn = cfn_tools.pretty(cfn,settings=pretty_settings)
+]]>
+</script>
+
+<p>Two blocks are stacked on a table and connected by a pulley as shown below. Somebody pushes the top block (block 2) leftwards with a force \(F\) and the blocks begin to move.</p>
+
+<image style="width:400px;display:block;margin-left:auto;margin-right:auto" src="/static/stacked_blocks_pulley_setup.svg"></image>
+
+<p>Draw free-body diagrams for block 1 and block 2. The pushing force \(F\) on block 2 has already been drawn. <em>Be sure that your force vectors start with their tails on the object.</em></p>
+
+<customresponse cfn="cfn">
+  <jsinput gradefn="getInput"
+    get_statefn="getState"
+    set_statefn="setState"
+    initial_state='{}'
+    width="660"
+    height="500"
+    html_file="/static/stacked_blocks_pulley_FBD.html"
+    />
+</customresponse>
+</problem>
