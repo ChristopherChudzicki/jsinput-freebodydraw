@@ -1,5 +1,5 @@
 # jsinput-freebodydraw
-Free-body drawing exercises with JSInput. A modification of the [jsinput-vectordraw](https://github.com/open-craft/jsinput-vectordraw) project.
+Free-body drawing exercises with JSInput. A modification of the [jsinput-vectordraw](https://github.com/open-craft/jsinput-vectordraw) project from DavidsonNext and OpenCraft.
 
 <img src="example.png" width="70%">
 
