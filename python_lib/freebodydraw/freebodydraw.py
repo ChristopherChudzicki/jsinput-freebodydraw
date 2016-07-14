@@ -60,7 +60,7 @@ def check_tail(check, vectors):
 
 def check_tip(check, vectors):
     vec = vectors[check['vector']]
-    tolerance = check.get('tolerance', 1.0)
+    tolerance = check.get('tolerance', 4.0)
     expected = check['expected']
     dist = math.hypot(expected[0] - vec.tip.x, expected[1] - vec.tip.y)
     if dist > tolerance:
@@ -138,7 +138,7 @@ def _angle_within_tolerance(vec, expected, tolerance):
 
 def check_angle(check, vectors):
     vec = vectors[check['vector']]
-    tolerance = check.get('tolerance', 2.0)
+    tolerance = check.get('tolerance', 4.0)
     expected = math.radians(check['expected'])
     angle_ok = _angle_within_tolerance(vec, expected, tolerance)
     angle_opposite = _angle_within_tolerance(vec, expected+math.pi, tolerance)
@@ -161,7 +161,7 @@ def check_angle(check, vectors):
 
 def check_angle_not(check,vectors):
     vec = vectors[check['vector']]
-    tolerance = check.get('tolerance', 2.0)
+    tolerance = check.get('tolerance', 4.0)
     expected = math.radians(check['expected'])
     if _angle_within_tolerance(vec, expected, tolerance):
         return _errmsg('The force {label} should not have angle {angle}', check, vectors)
