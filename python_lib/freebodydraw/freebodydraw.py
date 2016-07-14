@@ -52,7 +52,7 @@ def check_min_length(check, vectors):
         return _errmsg("Vector {label} is so short it's hard for us to understand. Please make {label} longer. (Your {label} length: {length:.1f})", check, vectors)
 def check_tail(check, vectors):
     vec = vectors[check['vector']]
-    tolerance = check.get('tolerance', 1.0)
+    tolerance = check.get('tolerance', 4.0)
     expected = check['expected']
     dist = math.hypot(expected[0] - vec.tail.x, expected[1] - vec.tail.y)
     if dist > tolerance:
