@@ -1226,6 +1226,19 @@ FreeBodyDraw.prototype.getInput = function(){
         }
         if ( _.contains(drawnVectorNames, name) ){
             checks.push(presence_check);
+            //if vector is drawn and should be drawn, check its min length
+            if (presence_check['expected']){
+                var min_length_check = {
+                    vector: name,
+                    check: 'min_length',
+                    expected:1.0,
+                    label: vecLabel,
+                    on: vec.on.long,
+                    from: vec.from.long,
+                    type: vec.forceType.long
+                }
+                checks.push(min_length_check)
+            }
         } else {
             undrawn_checks.push(presence_check);
         };
@@ -1258,8 +1271,10 @@ FreeBodyDraw.prototype.getInput = function(){
             }
         });
     },this);
+    
+    checks = checks.concat(undrawn_checks).concat(this.settings.custom_checks);
 
-    input.checks = checks.concat(undrawn_checks).concat(this.settings.custom_checks);
+    input.checks = checks
     
     return input
 }
