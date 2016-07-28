@@ -29,18 +29,19 @@ Free-body drawing exercises with JSInput. A modification of the [jsinput-vectord
 4. UI: selected vector is darker, thicker 
 5. UI: active/inactive status for "delete", "redo", "undo" buttons
 6. UI: remove "add vector" button
-7. Touchscreen: improved dragging and drawing on touchscreens
-8. Setup: use `forceDescriptors` to automatically generate a the list of drawable vectors
-9. Grading: first check that everything drawn so far is correct (and `presence:false` for unexpected vectors)
-10. Grading: some new check functions, e.g., `min_length` and `angle_not`
-11. Grading: customized feedback messages for
+7. Drawing: Snap vectors every 10 degrees by default (configurable)
+8. Touchscreen: improved dragging and drawing on touchscreens
+9. Setup: use `forceDescriptors` to automatically generate a the list of drawable vectors
+10. Grading: first check that everything drawn so far is correct (and `presence:false` for unexpected vectors)
+11. Grading: some new check functions, e.g., `min_length` and `angle_not`
+12. Grading: customized feedback messages for
     1. Nothing drawn
     2. Negligible graviational forces
     3. Normal forces drawn not normal to surface
     4. Friction forces drawn not parallel to surface
     5. Static friction pointing opposite direction
     6. Kinetic friction pointing opposite direction
-12. Examples: use [cfn_tools](https://github.com/ChristopherChudzicki/cfn_tools) to pretty-format error messages
+13. Examples: use [cfn_tools](https://github.com/ChristopherChudzicki/cfn_tools) to pretty-format error messages
 
 ## Installation
 
@@ -71,6 +72,7 @@ supports these properties:
 * `forceDescriptors`: An object that specifies all the forces a user can draw. More info below.
 * `expected_result`: The expected state of vectors after the user successfully solves the problem. The data given here is used for grading. More info below.
 * `custom_checks`: An array of custom checks used for grading. This is needed when the grading is more complex and can't be defined in terms of `expected_result` only. More info below.
+* `snapAngle`: snap vectors every `snapAngle` degrees. Defaults to `10`.
 * `axis`: Show the graph axis (defaults to `false`).
 * `show_navigation`: Show navigation arrows and zooom controls (defaults to `false`).
 * `show_vector_properties`: Show the vector properties box (defaults to `true`).

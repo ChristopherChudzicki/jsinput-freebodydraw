@@ -609,6 +609,16 @@ var FreeBodyDraw = function(element_id, settings){
 FreeBodyDraw.prototype = Object.create( VectorDraw.prototype );
 FreeBodyDraw.prototype.constructor = FreeBodyDraw;
 
+FreeBodyDraw.prototype.sanitizeSettings = function(settings){
+    var settings = VectorDraw.prototype.sanitizeSettings.call(this,settings);
+    var default_settings = {
+        snapAngle:10
+    }
+    settings = _.defaults(settings, default_settings);
+    
+    return settings
+}
+
 FreeBodyDraw.prototype.template = _.template([
     '<div class="header">',
     '<div class="menu">',
@@ -1151,8 +1161,32 @@ FreeBodyDraw.prototype.objectsUnderMouse = function(){
     return targetObjects
 }
 
+FreeBodyDraw.prototype.snap = function(vecIdx){
+    var vec = this.findJSXGVector(vecIdx);
+    var x1 = vec.point1.X(),
+        y1 = vec.point1.Y(),
+        x2 = vec.point2.X(),
+        y2 = vec.point2.Y();
+    var length = Math.sqrt( (x2-x1)*(x2-x1) + (y2-y1)*(y2-y1) );
+    var angle = Math.atan2(y2-y1, x2-x1)/Math.PI*180;
+    
+    // Round angle:
+    angle = Math.round(angle/this.settings.snapAngle) * this.settings.snapAngle;
+    var angle_rad = angle*Math.PI/180;
+    // update tip
+    x2 = x1 + length*Math.cos(angle_rad);
+    y2 = y1 + length*Math.sin(angle_rad);
+    
+    vec.point2.setPosition(JXG.COORDS_BY_USER,[x2,y2]);
+    this.board.fullUpdate();
+    this.updateVectorProperties(vec);
+}
+
 FreeBodyDraw.prototype.onBoardUp = function(evt){
     VectorDraw.prototype.onBoardUp.call(this,evt);
+    if (this.settings.snapAngle != 0){
+        this.snap(this.currentActiveVectorIdx);
+    }
     this.updateButtonsStatus();
 }
 
