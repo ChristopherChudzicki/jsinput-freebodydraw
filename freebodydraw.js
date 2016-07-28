@@ -1312,21 +1312,3 @@ FreeBodyDraw.prototype.getInput = function(){
     
     return input
 }
-
-/////////////////////////////////////////////////////
-
-// var freebodydraw = new FreeBodyDraw('freebodydraw', freebodydraw_settings);
-//
-// var getState = function() {
-//     var state = freebodydraw.getState();
-//     return JSON.stringify(state);
-// };
-//
-// var setState = function(serialized) {
-//     freebodydraw.setState(JSON.parse(serialized));
-// };
-//
-// var getInput = function() {
-//     var input = freebodydraw.getInput();
-//     return JSON.stringify(input);
-// };
