@@ -592,7 +592,7 @@ var FreeBodyDraw = function(element_id, settings){
 
     this.currentActiveVectorIdx = null;
     settings.activeStyle = {
-        lightness: -0.5,
+        lightness: 100,
         widthMultiplier:1.5
     };
 
@@ -609,14 +609,79 @@ var FreeBodyDraw = function(element_id, settings){
 FreeBodyDraw.prototype = Object.create( VectorDraw.prototype );
 FreeBodyDraw.prototype.constructor = FreeBodyDraw;
 
-FreeBodyDraw.prototype.sanitizeSettings = function(settings){
-    var settings = VectorDraw.prototype.sanitizeSettings.call(this,settings);
+FreeBodyDraw.prototype.sanitizeSettings = function(settings) {
+    // Fill in defaults at top level of settings.
     var default_settings = {
-        snapAngle:10
-    }
-    settings = _.defaults(settings, default_settings);
-    
-    return settings
+        width: 550,
+        height: 400,
+        axis: false,
+        background: null,
+        bounding_box_size: 10,
+        show_navigation: false,
+        show_vector_properties: true,
+        add_vector_label: 'Add Selected Force',
+        vector_properties_label: 'Vector Properties',
+        snapAngle:10,
+        vectors: [],
+        points: [],
+        expected_result: {},
+        custom_checks: [],
+        unit_vector_ratio: 1
+    };
+    _.defaults(settings, default_settings);
+    var width_scale = settings.width / settings.height,
+        box_size = settings.bounding_box_size;
+    settings.bounding_box = [-box_size*width_scale, box_size, box_size*width_scale, -box_size]
+
+    // Fill in defaults for vectors.
+    var default_vector = {
+        type: 'vector',
+        render: false,
+        length_factor: 1,
+        length_units: '',
+        base_angle: 0
+    };
+    var default_vector_style = {
+        pointSize: 1,
+        pointColor: 'red',
+        width: 4,
+        color: "#00004d",
+        label: null,
+        labelColor: 'black'
+    };
+    settings.vectors.forEach(function(vector) {
+        _.defaults(vector, default_vector);
+        if (!_.has(vector, 'style')) {
+            vector.style = {};
+        }
+        _.defaults(vector.style, default_vector_style);
+    });
+
+    // Fill in defaults for points.
+    var default_point = {
+        fixed: true,  // Default to true for backwards compatibility.
+        render: true
+    };
+    var default_point_style = {
+        size: 1,
+        withLabel: false,
+        color: 'pink',
+        showInfoBox: false
+    };
+    settings.points.forEach(function(point) {
+        _.defaults(point, default_point);
+        if (!_.has(point, 'style')) {
+            point.style = {};
+        }
+        _.defaults(point.style, default_point_style);
+        point.style.name = point.name;
+        point.style.fixed = point.fixed;
+        point.style.strokeColor = point.style.color;
+        point.style.fillColor = point.style.color;
+        delete point.style.color;
+    });
+
+    return settings;
 }
 
 FreeBodyDraw.prototype.template = _.template([
@@ -639,36 +704,42 @@ FreeBodyDraw.prototype.template = _.template([
     '           <legend>Select a force to draw.</legend>',
     '           <p>',
     '               <label>on: </label>',
+    '               <span class="select-wrapper">',
     '               <select id="on">',
     '                   <option disabled selected>Select...</option>',
     '                   <% forceDescriptors[1].shortNames.forEach(function(val,idx) { %>',
     '                   <option value="<%=val%>"> <%= forceDescriptors[1].longNames[idx] %> </option>',
     '                   <% }) %>',
     '               </select>',
+    '               </span>',
     '               <span id="on-warning" class="warning hidden">',
     '                   <i class="fa fa-exclamation-triangle"></i>',
     '               </span>',
     '           </p>',
     '           <p>',
     '               <label>from: </label>',
+    '               <span class="select-wrapper">',
     '               <select id="from">',
     '                   <option disabled selected>Select...</option>',
     '                   <% forceDescriptors[2].shortNames.forEach(function(val,idx) { %>',
     '                   <option value="<%=val%>"> <%= forceDescriptors[2].longNames[idx] %> </option>',
     '                   <% }) %>',
     '               </select>',
+    '               </span>',
     '               <span id="from-warning" class="warning hidden">',
     '                   <i class="fa fa-exclamation-triangle"></i>',
     '               </span>',
     '           </p>',
     '           <p>',
     '               <label>type: </label>',
+    '               <span class="select-wrapper">',
     '               <select id="type">',
     '                   <option disabled selected>Select...</option>',
     '                   <% forceDescriptors[0].shortNames.forEach(function(val,idx) { %>',
     '                   <option value="<%=val%>"> <%= forceDescriptors[0].longNames[idx] %> </option>',
     '                   <% }) %>',
     '               </select>',
+    '               <span>',
     '           </p>',
     '       </fieldset>',
     '   </div>',
@@ -766,6 +837,7 @@ FreeBodyDraw.prototype.setActiveFromDescription = function(){
     }
     //Style new active vector as active
     if (this.isDrawn(newIdx)) {
+        this.indicateMenuChange();
         this.styleVectorAsActive(newIdx);
     }
     
@@ -1020,6 +1092,7 @@ FreeBodyDraw.prototype.onDescriptionChange = function(){
     }
     
     if (abort){
+        this.currentActiveVectorIdx = null;
         return;
     }
     
@@ -1126,6 +1199,12 @@ FreeBodyDraw.prototype.styleVectorAsInactive = function(vecIdx){
         highlightCssClass:"vec-label"
     });
 }
+FreeBodyDraw.prototype.indicateMenuChange = function(){    
+    // To make highlight-fade animation replayable, removeClass, reflow, then addClass. Calculating .width() forces a reflow. See Jesper Ek's comment at https://css-tricks.com/restart-css-animation/
+    var selection = $(".menu, .vec-label.active",this.element);
+    selection.removeClass("highlight-fade").width();
+    selection.addClass("highlight-fade")
+}
 
 FreeBodyDraw.prototype.updateDeleteStatus = function(){
     console.log("updateDeleteStatus")
@@ -1184,7 +1263,7 @@ FreeBodyDraw.prototype.snap = function(vecIdx){
 
 FreeBodyDraw.prototype.onBoardUp = function(evt){
     VectorDraw.prototype.onBoardUp.call(this,evt);
-    if (this.settings.snapAngle != 0){
+    if (this.settings.snapAngle != 0 && this.currentActiveVectorIdx != null){
         this.snap(this.currentActiveVectorIdx);
     }
     this.updateButtonsStatus();
