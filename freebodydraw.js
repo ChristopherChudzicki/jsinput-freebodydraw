@@ -1199,15 +1199,11 @@ FreeBodyDraw.prototype.styleVectorAsInactive = function(vecIdx){
         highlightCssClass:"vec-label"
     });
 }
-FreeBodyDraw.prototype.indicateMenuChange = function(){
-    $(".menu",this.element).removeClass("highlight-fade");
-    $(".vec-label.active",this.element).removeClass("highlight-fade");
-    // First remove menu-change class, then wait 1ms and add the class to begin animation. 
-    setTimeout(function(){
-        $(".menu",this.element).addClass("highlight-fade");
-        $(".vec-label.active",this.element).addClass("highlight-fade");
-    }, 100);
-    
+FreeBodyDraw.prototype.indicateMenuChange = function(){    
+    // To make highlight-fade animation replayable, removeClass, reflow, then addClass. Calculating .width() forces a reflow. See Jesper Ek's comment at https://css-tricks.com/restart-css-animation/
+    var selection = $(".menu, .vec-label.active",this.element);
+    selection.removeClass("highlight-fade").width();
+    selection.addClass("highlight-fade")
 }
 
 FreeBodyDraw.prototype.updateDeleteStatus = function(){
@@ -1267,7 +1263,6 @@ FreeBodyDraw.prototype.snap = function(vecIdx){
 
 FreeBodyDraw.prototype.onBoardUp = function(evt){
     VectorDraw.prototype.onBoardUp.call(this,evt);
-    console.log(this.currentActiveVectorIdx)
     if (this.settings.snapAngle != 0 && this.currentActiveVectorIdx != null){
         this.snap(this.currentActiveVectorIdx);
     }
