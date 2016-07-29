@@ -130,7 +130,10 @@ fieldset h3 {
 fieldset select, 
 fieldset label {
     display: table-cell;
-    margin: 3px;
+    margin-top: 3px;
+    margin-bottom: 3px;
+    padding-top:3px;
+    padding-bottom:3px;
 }
 fieldset label {
     text-align: right;
@@ -140,13 +143,56 @@ fieldset .warning i {
     color:#ffcc00;
 }
 
+/* styles for FreeBodyDraw.indicateMenuChange() */
+.menu span.select-wrapper {
+    padding:2px;
+    margin:0px;
+    border-radius:5px;
+}
+
+.menu.highlight-fade span.select-wrapper {
+    -webkit-animation: border-fade 1s linear;
+    animation: border-fade 1s linear;
+}
+
+.menu.highlight-fade .vector-prop-name .value {
+    -webkit-animation: textfade 1s linear;
+    animation: textfade 1s linear;
+}
+
+.vec-label.active.highlight-fade {
+    -webkit-animation: textfade 1s linear;
+    animation: textfade 1s linear;
+}
+
+@keyframes border-fade {
+  0% {
+      box-shadow: 0 0 3pt 3pt rgba(52,152,219,1);
+  }
+  100% {
+      box-shadow:none;
+  }
+}
+
+@keyframes textfade {
+  0% {
+      text-shadow: 0px 0px 0.5pt rgba(52,152,219,1);
+      color:rgba(52,152,219,1);
+  }
+  100% {
+      text-shadow:none;
+      color:black;
+  }
+}
+
+/* styless for vector labels */
 .vec-label span{
     font-size:16px;
     font-weight:normal;
 }
 
 .vec-label.active span {
-    font-size:20px;
+    font-size:24px;
     font-weight:bold;
 }
 
