@@ -837,8 +837,8 @@ FreeBodyDraw.prototype.setActiveFromDescription = function(){
     }
     //Style new active vector as active
     if (this.isDrawn(newIdx)) {
-        this.indicateMenuChange();
         this.styleVectorAsActive(newIdx);
+        this.indicateMenuChange();
     }
     
     this.setSelectedFromIdx(newIdx);
