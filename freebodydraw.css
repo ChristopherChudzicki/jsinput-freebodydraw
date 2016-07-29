@@ -148,18 +148,18 @@ fieldset .warning i {
 }
 
 .menu.highlight-fade .select-wrapper {
-    -webkit-animation: border-fade 1s ease-out;
-    animation: border-fade 1s ease-out;
+    -webkit-animation: border-fade 1s ease-in-out;
+    animation: border-fade 1s ease-in-out;
 }
 
 .menu.highlight-fade .vector-prop-name .value {
-    -webkit-animation: text-fade 1s ease-out;
-    animation: text-fade 1s ease-out;
+    -webkit-animation: text-fade 1s ease-in-out;
+    animation: text-fade 1s ease-in-out;
 }
 
 .vec-label.active.highlight-fade {
-    -webkit-animation: text-fade 1s ease-out;
-    animation: text-fade 1s ease-out;
+    -webkit-animation: text-fade 1s ease-in-out;
+    animation: text-fade 1s ease-in-out;
 }
 
 @keyframes border-fade {
