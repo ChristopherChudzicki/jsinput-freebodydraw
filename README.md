@@ -1,6 +1,8 @@
 # jsinput-freebodydraw
 Free-body drawing exercises with JSInput. A modification of the [jsinput-vectordraw](https://github.com/open-craft/jsinput-vectordraw) project from DavidsonNext and OpenCraft.
 
+[View example](https://cdn.rawgit.com/ChristopherChudzicki/jsinput-freebodydraw/master/live_example.html) (For now, example does not have "Check"-button grading as edX would.)
+
 <img src="example.png" width="70%">
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
