@@ -1201,6 +1201,7 @@ FreeBodyDraw.prototype.styleVectorAsInactive = function(vecIdx){
         highlightCssClass:"vec-label"
     });
 }
+
 FreeBodyDraw.prototype.indicateMenuChange = function(){    
     // To make highlight-fade animation replayable, removeClass, reflow, then addClass. Calculating .width() forces a reflow. See Jesper Ek's comment at https://css-tricks.com/restart-css-animation/
     var selection = $(".menu, .vec-label.active",this.element);
