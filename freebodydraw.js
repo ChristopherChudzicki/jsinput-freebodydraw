@@ -2,6 +2,7 @@
 
 /////////////////////////////////////////////////////
 // Disable scrolling http://stackoverflow.com/a/4770179/2747370
+
 function preventDefault(e) {
   e = e || window.event;
   if (e.preventDefault)
@@ -10,6 +11,7 @@ function preventDefault(e) {
 }
 
 function preventDefaultForScrollKeys(e) {
+    var keys = {37: 1, 38: 1, 39: 1, 40: 1};
     if (keys[e.keyCode]) {
         preventDefault(e);
         return false;
