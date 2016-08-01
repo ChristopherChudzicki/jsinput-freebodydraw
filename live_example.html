@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+        <link href="freebodydraw.css" rel="stylesheet" type="text/css" />
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.2/underscore-min.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jsxgraph/0.98/jsxgraphcore.js"></script>
+        <script type="text/javascript" src="freebodydraw.js"></script>
+    </head>
+			
+    <body>
+        <div id="freebodydraw" />
+        
+        <script type="text/javascript">
+          // Background image, vectors, and points are defined below.       
+        
+        var forceDescriptors = [
+            {
+                label:"type", 
+                shortNames:["N","W","T","fs","fk"],
+                longNames:["Normal","Gravitational","Tension","Friction (static)","Friction (kinetic)"]
+            },
+            {
+                label:"on",
+                shortNames:["box"],
+                longNames:["box"]
+            },
+            {
+                label:"by",
+                shortNames:["ramp","Earth"],
+                longNames:["ramp","Earth"]
+            }
+        ];
+        
+        var box = [-0.05679335954565312,0.9130624726954997];
+                
+        var expected_results = {
+            'N_box_ramp'  : {tail:box, angle:110, angle_tolerance:8},
+            'W_box_Earth' : {tail:box, angle:270, angle_not: 200, angle_not_tolerance: 4, angle_not_errmsg: "The Earth pulls the box straight downwards. The ramp does not affect the direction of {label}."},
+            'fs_box_ramp' : {tail:box, angle:20},
+        }
+          
+        var freebodydraw_settings = {
+            width: 650,
+            height: 350,
+            bounding_box_size: 10,
+            background: {
+                src: 'live_example_background.svg',
+                width: 20*650/350
+            },
+            forceDescriptors: forceDescriptors,
+            expected_result: expected_results
+        };
+        </script>
+        <script>
+        var freebodydraw = new FreeBodyDraw('freebodydraw', freebodydraw_settings);
+        
+        var getState = function() {
+            var state = freebodydraw.getState();
+            return JSON.stringify(state);
+        };
+        var setState = function(serialized) {
+            freebodydraw.setState(JSON.parse(serialized));
+        };
+        var getInput = function() {
+            var input = freebodydraw.getInput();
+            return JSON.stringify(input);
+        };
+        </script>
+	</body>
+</html>
