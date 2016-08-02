@@ -864,9 +864,14 @@ FreeBodyDraw.prototype.updateDescriptionFromVector = function(vector){
 // Inherit updateVectorProperties for updating drawn vectors
 FreeBodyDraw.prototype.updateVectorProperties = function(vector){
     VectorDraw.prototype.updateVectorProperties.call(this,vector);
-
+    
     var describedVecIdx = this.getDescribedVectorIdx();
-    var describedVecName = this.settings.vectors[describedVecIdx].name;
+    if (describedVecIdx >= 0){
+        var describedVecName = this.settings.vectors[describedVecIdx].name;
+    } else {
+        // If no vector is described, then getDescribedVectorIdx will return -1
+        var describedVecName = null;
+    }
 
     //If described vec does not match selected vector, update described vec
     if (vector.name === describedVecName){
@@ -1287,8 +1292,10 @@ FreeBodyDraw.prototype.getState = function(){
 FreeBodyDraw.prototype.setState = function(state){
     VectorDraw.prototype.setState.call(this,state);
     var activeVector = this.settings.vectors[state.currentActiveVectorIdx]
-    this.updateDescriptionFromVector(activeVector)
-    this.updateButtonsStatus();
+    if (activeVector) {
+        this.updateDescriptionFromVector(activeVector)
+        this.updateButtonsStatus();
+    }
 }
 
 FreeBodyDraw.prototype.getInput = function(){
