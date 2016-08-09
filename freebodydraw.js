@@ -1054,7 +1054,7 @@ FreeBodyDraw.prototype.renderVector = function(idx, coords) {
         size:-1,
         showInfoBox:false,
         label:{
-            offset:[0,0],
+            offset: vec.style.label_offset || [0,0],
             highlightStrokeColor:'black',
             cssClass: labelStyle,
             highlightCssClass: labelStyle,
