@@ -277,3 +277,19 @@ class Grader(object):
 
     def _get_points(self, answer):
         return {name: Point(*coords) for name, coords in answer['points'].iteritems()}
+
+def answer_url(original_url, answer):
+    def round_list_inplace(lst, digits=2):
+        for index, item in enumerate(lst):
+            if isinstance(item, list):
+                round_list_inplace(item)
+            else:
+                lst[index] = round(item, digits)
+    for vec in answer:
+        for key in ['tail', 'coords']:
+            try:
+                round_list_inplace(vec[key])
+            except KeyError:
+                pass
+    query_string = "?answer=" + urllib.quote( json.dumps(answer).replace(' ','') )
+    return original_url + query_string
