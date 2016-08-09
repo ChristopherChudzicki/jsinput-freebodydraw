@@ -1,41 +1,5 @@
 'use strict';
 
-/////////////////////////////////////////////////////
-// Disable scrolling http://stackoverflow.com/a/4770179/2747370
-
-function preventDefault(e) {
-  e = e || window.event;
-  if (e.preventDefault)
-      e.preventDefault();
-  e.returnValue = false;  
-}
-
-function preventDefaultForScrollKeys(e) {
-    var keys = {37: 1, 38: 1, 39: 1, 40: 1};
-    if (keys[e.keyCode]) {
-        preventDefault(e);
-        return false;
-    }
-}
-
-function disableScroll() {
-  if (window.addEventListener) // older FF
-      window.addEventListener('DOMMouseScroll', preventDefault, false);
-  window.onwheel = preventDefault; // modern standard
-  window.onmousewheel = document.onmousewheel = preventDefault; // older browsers, IE
-  window.ontouchmove  = preventDefault; // mobile
-  document.onkeydown  = preventDefaultForScrollKeys;
-}
-
-function enableScroll() {
-    if (window.removeEventListener)
-        window.removeEventListener('DOMMouseScroll', preventDefault, false);
-    window.onmousewheel = document.onmousewheel = null; 
-    window.onwheel = null; 
-    window.ontouchmove = null;  
-    document.onkeydown = null;  
-}
-
 var VectorDraw = function(element_id, settings) {
     this.board = null;
     this.dragged_vector = null;
@@ -48,11 +12,16 @@ var VectorDraw = function(element_id, settings) {
     this.element.on('click', '.add-vector', this.addElementFromList.bind(this));
     this.element.on('click', '.undo', this.undo.bind(this));
     this.element.on('click', '.redo', this.redo.bind(this));
-    
     // Prevents default image drag and drop actions in some browsers.
     this.element.on('mousedown', '.jxgboard image', function(evt) { evt.preventDefault(); });
 
     this.render();
+    
+    var queryString = this.getQueryString();
+    if (queryString.answer != undefined){
+        var answer = JSON.parse(queryString.answer);
+        this.displayAnswer(answer);
+    }
 };
 
 VectorDraw.prototype.sanitizeSettings = function(settings) {
@@ -62,9 +31,11 @@ VectorDraw.prototype.sanitizeSettings = function(settings) {
         height: 400,
         axis: false,
         background: null,
+        snap_angle_increment: 0,
         bounding_box_size: 10,
         show_navigation: false,
         show_vector_properties: true,
+        show_add_vector: true,
         add_vector_label: 'Add Selected Force',
         vector_properties_label: 'Vector Properties',
         vectors: [],
@@ -84,7 +55,9 @@ VectorDraw.prototype.sanitizeSettings = function(settings) {
         render: false,
         length_factor: 1,
         length_units: '',
-        base_angle: 0
+        base_angle: 0,
+        fixed_length_and_orientation: false,
+        fixed: false,
     };
     var default_vector_style = {
         pointSize: 1,
@@ -141,7 +114,10 @@ VectorDraw.prototype.template = _.template([
     '            <option value="point-<%= idx %>"><%= point.description %></option>',
     '        <% }}) %>',
     '        </select>',
-    '        <button class="add-vector"><%= add_vector_label %></button>',
+    '        <% var addVectorClass = show_add_vector ? "" : "hidden" %>',
+    '        <button class="add-vector <%= addVectorClass%>">',
+    '           <%= add_vector_label %>',
+    '        </button>',
     '        <button class="reset">Reset</button>',
     '        <button class="undo" title="Undo"><span class="fa fa-undo" /></button>',
     '        <button class="redo" title="redo"><span class="fa fa-repeat" /></button>',
@@ -256,14 +232,21 @@ VectorDraw.prototype.removePoint = function(idx) {
 
 VectorDraw.prototype.getVectorCoordinates = function(vec) {
     var coords = vec.coords;
+    var comps = vec.comps;
     if (!coords) {
         var tail = vec.tail || [0, 0];
-        var length = 'length' in vec ? vec.length : 5;
-        var angle = 'angle' in vec ? vec.angle : 30;
-        var radians = angle * Math.PI / 180;
+        if (!comps) {
+            var length = 'length' in vec ? vec.length : 5;
+            var angle = 'angle' in vec ? vec.angle : 30;
+            var radians = angle * Math.PI / 180;
+            comps = [
+                Math.cos(radians) * length,
+                Math.sin(radians) * length
+            ]
+        }
         var tip = [
-            tail[0] + Math.cos(radians) * length,
-            tail[1] + Math.sin(radians) * length
+            tail[0] + comps[0],
+            tail[1] + comps[1]
         ];
         coords = [tail, tip];
     }
@@ -300,7 +283,7 @@ VectorDraw.prototype.renderVector = function(idx, coords) {
 
     var tail = this.board.create('point', coords[0], {
         name: vec.name,
-        size: style.pointSize,
+        size: (vec.type === 'arrow' | vec.type === 'vector') ? -1 : style.pointSize,
         fillColor: style.pointColor,
         strokeColor: style.pointColor,
         withLabel: false,
@@ -312,14 +295,24 @@ VectorDraw.prototype.renderVector = function(idx, coords) {
         size: style.pointSize,
         fillColor: style.pointColor,
         strokeColor: style.pointColor,
-        withLabel: true,
-        showInfoBox: false,
-        label:{}
+        withLabel: false,
+        showInfoBox: false
     });
+    if (vec.fixed_length_and_orientation){
+        tip.hideElement();
+    }
+    var labelPoint  = this.board.create('point', [function(){return tip.X()}, function(){return tip.Y()}], {
+        name: vec.style.label || vec.name,
+        withLabel: true,
+        size:-1,
+        showInfoBox: false
+    })
     // Not sure why, but including labelColor in attributes above doesn't work,
     // it only works when set explicitly with setAttribute.
-    tip.setAttribute({labelColor: style.labelColor});
-
+    labelPoint.setAttribute({labelColor: style.labelColor});
+    // add labelPoint as child of tip, which enables removal later.
+    tip.addChild(labelPoint);
+    
     var line_type = (vec.type === 'vector') ? 'arrow' : vec.type;
     var line = this.board.create(line_type, [tail, tip], {
         name: vec.name,
@@ -327,7 +320,13 @@ VectorDraw.prototype.renderVector = function(idx, coords) {
         strokeColor: style.color
     });
 
-    tip.label.setAttribute({fontsize: 18, highlightStrokeColor: 'black'});
+    if (vec.fixed) {
+        line.setAttribute({fixed:true, highlight:false});
+        tail.hideElement();
+        tip.hideElement();
+    }
+
+    labelPoint.label.setAttribute({fontsize: 18, highlightStrokeColor: 'black'});
 
     // Disable the <option> element corresponding to vector.
     var option = this.getMenuOption('vector', idx);
@@ -404,6 +403,57 @@ VectorDraw.prototype.redo = function() {
         this.setState(state);
     }
 };
+
+VectorDraw.prototype.getQueryString = function () {
+    // modified from http://stackoverflow.com/a/979995/2747370
+    var query_string = {};
+    var query = window.location.search.substring(1);
+    if (query === ""){
+        return query_string
+    }
+    var vars = query.split("&");
+    for (var i=0;i<vars.length;i++) {
+        var pair = vars[i].split("=");
+        // If first entry with this name
+        if (typeof query_string[pair[0]] === "undefined") {
+            query_string[pair[0]] = decodeURIComponent(pair[1]);
+            // If second entry with this name
+        } else if (typeof query_string[pair[0]] === "string") {
+            var arr = [ query_string[pair[0]],decodeURIComponent(pair[1]) ];
+            query_string[pair[0]] = arr;
+            // If third or later entry with this name
+        } else {
+            query_string[pair[0]].push(decodeURIComponent(pair[1]));
+        }
+    }
+    return query_string;
+}
+
+VectorDraw.prototype.loadAnswer = function(answer) {
+    // Alter this.settings.vectors so that the answer is rendered.
+    for (var j=0; j<answer.length; j++ ){
+        // new settings for vec
+        var answerVec = answer[j];
+        answerVec.render = true;
+        answerVec.fixed = true;
+        
+        // find vec from settings.vectors
+        var settingsVecIdx = _.findIndex( this.settings['vectors'], function(vec){return vec.name === answerVec.name} );
+        var settingsVec = this.settings.vectors[ settingsVecIdx ];
+        // delete coordinates so it can be overriden by answerVec
+        delete settingsVec.coords
+        
+        // update settings.vectors with new settings
+        _.extend(settingsVec,answerVec);
+    }
+};
+
+VectorDraw.prototype.displayAnswer = function(answer){
+    this.loadAnswer(answer);
+    this.render();
+    this.element.children().not('.jxgboard').hide();
+    this.element.css("pointer-events", "none");
+}
 
 VectorDraw.prototype.getMouseCoords = function(evt) {
     var i = evt[JXG.touchProperty] ? 0 : undefined;
@@ -487,12 +537,92 @@ VectorDraw.prototype.canCreateVectorOnTopOf = function(el) {
     return true;
 };
 
-VectorDraw.prototype.objectsUnderMouse = function(coords) {
-    var filter = function(el) {
-        return !(el instanceof JXG.Image) && el.hasPoint(coords.scrCoords[1], coords.scrCoords[2]);
-    };
-    return _.filter(_.values(this.board.objects), filter);
-};
+VectorDraw.prototype.objectsUnderMouse = function(){
+    var targetObjects = [];
+    var highlightedObjects = this.board.highlightedObjects
+    var keys = Object.keys(highlightedObjects);
+    for (var i = 0; i < keys.length; i++) {
+        targetObjects.push( highlightedObjects[keys[i]] );
+    }
+    return targetObjects
+}
+
+VectorDraw.prototype.preventDefault = function(e) {
+    // for disabling scroll http://stackoverflow.com/a/4770179/2747370
+    e = e || window.event;
+    if (e.preventDefault){
+        e.preventDefault();
+    }
+    e.returnValue = false;  
+}
+
+VectorDraw.prototype.preventDefaultForScrollKeys = function(e) {
+    // for disabling scroll http://stackoverflow.com/a/4770179/2747370
+    var keys = {37: 1, 38: 1, 39: 1, 40: 1};
+    if (keys[e.keyCode]) {
+        this.preventDefault(e);
+        return false;
+    }
+}
+
+VectorDraw.prototype.disableScroll = function() {
+    // for disabling scroll http://stackoverflow.com/a/4770179/2747370
+    var preventDefault = this.preventDefault;
+    var preventDefaultForScrollKeys = this.preventDefaultForScrollKeys;
+    if (window.addEventListener){ // older FF
+        window.addEventListener('DOMMouseScroll', preventDefault, false);
+    }
+    window.onwheel = preventDefault; // modern standard
+    window.onmousewheel = document.onmousewheel = preventDefault; // older browsers, IE
+    window.ontouchmove  = preventDefault; // mobile
+    document.onkeydown  = preventDefaultForScrollKeys;
+}   
+
+VectorDraw.prototype.enableScroll = function() {
+    // for disabling scroll http://stackoverflow.com/a/4770179/2747370
+    var preventDefault = this.preventDefault;
+    var preventDefaultForScrollKeys = this.preventDefaultForScrollKeys;
+    if (window.removeEventListener){
+        window.removeEventListener('DOMMouseScroll', preventDefault, false);
+    }
+    window.onmousewheel = document.onmousewheel = null; 
+    window.onwheel = null; 
+    window.ontouchmove = null;  
+    document.onkeydown = null;  
+}
+
+VectorDraw.prototype.snapAngle = function(vector){
+    if (this.settings.snap_angle_increment === 0){
+        return
+    }
+    
+    if (vector.point2.lastDragTime > vector.point1.lastDragTime){
+        // p1 is always the anchor; p2 can move during snap
+        var p1 = vector.point1;
+        var p2 = vector.point2;
+    } else {
+        var p1 = vector.point2;
+        var p2 = vector.point1;
+    }
+    
+    // Calculate new position for p2
+    var x1 = p1.X(),
+        y1 = p1.Y(),
+        x2 = p2.X(),
+        y2 = p2.Y();
+    var length = Math.sqrt( (x2-x1)*(x2-x1) + (y2-y1)*(y2-y1) );
+    var angle = Math.atan2(y2-y1, x2-x1)/Math.PI*180;
+    angle = Math.round(angle/this.settings.snap_angle_increment) * this.settings.snap_angle_increment;
+    var angle_rad = angle*Math.PI/180;
+    
+    // update p2
+    x2 = x1 + length*Math.cos(angle_rad);
+    y2 = y1 + length*Math.sin(angle_rad);
+    
+    p2.setPosition(JXG.COORDS_BY_USER,[x2,y2]);
+    this.board.fullUpdate();
+    this.updateVectorProperties(vector);
+}
 
 VectorDraw.prototype.onBoardDown = function(evt) {
     this.pushHistory();
@@ -504,7 +634,7 @@ VectorDraw.prototype.onBoardDown = function(evt) {
         var point_coords = [coords.usrCoords[1], coords.usrCoords[2]];
         if (selected.type === 'vector') {
             this.drawMode = true;
-            disableScroll();
+            this.disableScroll();
             this.dragged_vector = this.renderVector(selected.idx, [point_coords, point_coords]);
         } else {
             this.renderPoint(selected.idx, point_coords);
@@ -532,8 +662,11 @@ VectorDraw.prototype.onBoardMove = function(evt) {
 };
 
 VectorDraw.prototype.onBoardUp = function(evt) {
-    enableScroll();
+    this.enableScroll();
     this.drawMode = false;
+    if (this.dragged_vector) {
+        this.snapAngle(this.dragged_vector);
+    }
     if (this.dragged_vector && !this.isVectorTailDraggable(this.dragged_vector)) {
         this.dragged_vector.point1.setProperty({fixed: true});
     }
@@ -587,11 +720,10 @@ VectorDraw.prototype.setState = function(state) {
     this.board.update();
 };
 
-
 /////////////////////////////////////////////////////
 var FreeBodyDraw = function(element_id, settings){
     settings.vectors = this.forceVectorsFromDescriptors(settings.forceDescriptors);
-
+    settings.snap_angle_increment = 10;
     this.currentActiveVectorIdx = null;
     settings.activeStyle = {
         lightness: 100,
@@ -611,81 +743,7 @@ var FreeBodyDraw = function(element_id, settings){
 FreeBodyDraw.prototype = Object.create( VectorDraw.prototype );
 FreeBodyDraw.prototype.constructor = FreeBodyDraw;
 
-FreeBodyDraw.prototype.sanitizeSettings = function(settings) {
-    // Fill in defaults at top level of settings.
-    var default_settings = {
-        width: 550,
-        height: 400,
-        axis: false,
-        background: null,
-        bounding_box_size: 10,
-        show_navigation: false,
-        show_vector_properties: true,
-        add_vector_label: 'Add Selected Force',
-        vector_properties_label: 'Vector Properties',
-        snapAngle:10,
-        vectors: [],
-        points: [],
-        expected_result: {},
-        custom_checks: [],
-        unit_vector_ratio: 1
-    };
-    _.defaults(settings, default_settings);
-    var width_scale = settings.width / settings.height,
-        box_size = settings.bounding_box_size;
-    settings.bounding_box = [-box_size*width_scale, box_size, box_size*width_scale, -box_size]
-
-    // Fill in defaults for vectors.
-    var default_vector = {
-        type: 'vector',
-        render: false,
-        length_factor: 1,
-        length_units: '',
-        base_angle: 0
-    };
-    var default_vector_style = {
-        pointSize: 1,
-        pointColor: 'red',
-        width: 4,
-        color: "#00004d",
-        label: null,
-        labelColor: 'black'
-    };
-    settings.vectors.forEach(function(vector) {
-        _.defaults(vector, default_vector);
-        if (!_.has(vector, 'style')) {
-            vector.style = {};
-        }
-        _.defaults(vector.style, default_vector_style);
-    });
-
-    // Fill in defaults for points.
-    var default_point = {
-        fixed: true,  // Default to true for backwards compatibility.
-        render: true
-    };
-    var default_point_style = {
-        size: 1,
-        withLabel: false,
-        color: 'pink',
-        showInfoBox: false
-    };
-    settings.points.forEach(function(point) {
-        _.defaults(point, default_point);
-        if (!_.has(point, 'style')) {
-            point.style = {};
-        }
-        _.defaults(point.style, default_point_style);
-        point.style.name = point.name;
-        point.style.fixed = point.fixed;
-        point.style.strokeColor = point.style.color;
-        point.style.fillColor = point.style.color;
-        delete point.style.color;
-    });
-
-    return settings;
-}
-
+// modified copy
 FreeBodyDraw.prototype.template = _.template([
     '<div class="header">',
     '<div class="menu">',
@@ -795,7 +853,7 @@ FreeBodyDraw.prototype.forceVectorsFromDescriptors = function(descriptors){
                     vec.name = [type[i],on[j],from[k]].join("_");
                     vec.description = vec.name;
                     vec.render = false;
-                    vec.style = {};
+                    vec.style = {color:'navy'};
                     vec.style.label = "<span>" + type[i] + "<sub>" + on[j] + "," + from[k] + "</sub>" + "</span>";
                     vec.forceType ={};
                     vec.forceType.short = type[i];
@@ -932,7 +990,7 @@ FreeBodyDraw.prototype.onDeleteDown = function(){
     this.updateButtonsStatus();
 }
 
-// Has styling differences from VectorDraw.prototype.renderVector
+// modified copy, has styling differences from VectorDraw.prototype.renderVector
 FreeBodyDraw.prototype.renderVector = function(idx, coords) {
     var vec = this.settings.vectors[idx];
     coords = coords || this.getVectorCoordinates(vec);
@@ -944,20 +1002,18 @@ FreeBodyDraw.prototype.renderVector = function(idx, coords) {
         board_object.point2.setPosition(JXG.COORDS_BY_USER, coords[1]);
         return;
     }
-    
+
     var style = vec.style,
-        labelStyle = "vec-label"
+        labelStyle = "vec-label";
     //If this vector is the active vector, style it as such. (Vectors rendered by redo are not automatically active.)
     if (idx === this.currentActiveVectorIdx){
         style = this.makeActiveStyle(style);
         labelStyle += " active"
     } 
 
-    //tip and tail are used to draw vector
-    //labelPoint is used to place the label a constant distance from vector tip in the direction of the vector
     var tail = this.board.create('point', coords[0], {
         name: vec.name,
-        size: -1, //FreeBodyDraw always uses arrows, so do not display tail point
+        size: (vec.type === 'arrow' | vec.type === 'vector') ? -1 : style.pointSize,
         fillColor: style.pointColor,
         strokeColor: style.pointColor,
         withLabel: false,
@@ -965,16 +1021,16 @@ FreeBodyDraw.prototype.renderVector = function(idx, coords) {
         showInfoBox: false
     });
     var tip = this.board.create('point', coords[1], {
-        name: style.label || vec.name,
+        name: vec.style.label || vec.name,
         size: style.pointSize,
         fillColor: style.pointColor,
         strokeColor: style.pointColor,
         withLabel: false,
-        showInfoBox: false,
-        label:{
-            offset:[0,0]
-        }
+        showInfoBox: false
     });
+    if (vec.fixed_length_and_orientation){
+        tip.hideElement();
+    }
     var labelPoint = this.board.createElement('point',[
         function(){ 
             var x1 = tail.X(),
@@ -994,7 +1050,7 @@ FreeBodyDraw.prototype.renderVector = function(idx, coords) {
         }
     ],
     {
-        name: style.label,
+        name: vec.style.label || vec.name,
         size:-1,
         showInfoBox:false,
         label:{
@@ -1033,7 +1089,9 @@ FreeBodyDraw.prototype.renderVector = function(idx, coords) {
             
         return 0.5 + L*a*(Math.abs(x)-x)/(1+a*Math.abs(x)+4*y*y);
     }
-
+    // add labelPoint as child of tip, which enables removal later.
+    tip.addChild(labelPoint);
+    
     var line_type = (vec.type === 'vector') ? 'arrow' : vec.type;
     var line = this.board.create(line_type, [tail, tip], {
         name: vec.name,
@@ -1041,24 +1099,17 @@ FreeBodyDraw.prototype.renderVector = function(idx, coords) {
         strokeColor: style.color
     });
 
+    if (vec.fixed) {
+        line.setAttribute({fixed:true, highlight:false});
+        tail.hideElement();
+        tip.hideElement();
+    }
+
     // Disable the <option> element corresponding to vector.
     var option = this.getMenuOption('vector', idx);
     option.prop('disabled', true).prop('selected', false);
 
     return line;
-};
-
-FreeBodyDraw.prototype.removeVector = function(idx) {
-    var vec = this.settings.vectors[idx];
-    var object = this.board.elementsByName[vec.name];
-    var label = this.board.elementsByName[vec.style.label];
-    if (object) {
-        this.board.removeAncestors(object);
-        this.board.removeAncestors(label);
-        // Enable the <option> element corresponding to vector.
-        var option = this.getMenuOption('vector', idx);
-        option.prop('disabled', false);
-    }
 };
 
 FreeBodyDraw.prototype.isDrawn = function(vecIdx){
@@ -1248,32 +1299,8 @@ FreeBodyDraw.prototype.objectsUnderMouse = function(){
     return targetObjects
 }
 
-FreeBodyDraw.prototype.snap = function(vecIdx){
-    var vec = this.findJSXGVector(vecIdx);
-    var x1 = vec.point1.X(),
-        y1 = vec.point1.Y(),
-        x2 = vec.point2.X(),
-        y2 = vec.point2.Y();
-    var length = Math.sqrt( (x2-x1)*(x2-x1) + (y2-y1)*(y2-y1) );
-    var angle = Math.atan2(y2-y1, x2-x1)/Math.PI*180;
-    
-    // Round angle:
-    angle = Math.round(angle/this.settings.snapAngle) * this.settings.snapAngle;
-    var angle_rad = angle*Math.PI/180;
-    // update tip
-    x2 = x1 + length*Math.cos(angle_rad);
-    y2 = y1 + length*Math.sin(angle_rad);
-    
-    vec.point2.setPosition(JXG.COORDS_BY_USER,[x2,y2]);
-    this.board.fullUpdate();
-    this.updateVectorProperties(vec);
-}
-
 FreeBodyDraw.prototype.onBoardUp = function(evt){
     VectorDraw.prototype.onBoardUp.call(this,evt);
-    if (this.settings.snapAngle != 0 && this.currentActiveVectorIdx != null){
-        this.snap(this.currentActiveVectorIdx);
-    }
     this.updateButtonsStatus();
 }
 
