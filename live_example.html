@@ -18,7 +18,7 @@
         var forceDescriptors = [
             {
                 label:"type", 
-                shortNames:["N","W","T","fs","fk"],
+                shortNames:["N","Fg","T","fs","fk"],
                 longNames:["Normal","Gravitational","Tension","Friction (static)","Friction (kinetic)"]
             },
             {
@@ -37,7 +37,7 @@
                 
         var expected_results = {
             'N_box_ramp'  : {tail:box, angle:110, angle_tolerance:8},
-            'W_box_Earth' : {tail:box, angle:270, angle_not: 200, angle_not_tolerance: 4, angle_not_errmsg: "The Earth pulls the box straight downwards. The ramp does not affect the direction of {label}."},
+            'Fg_box_Earth' : {tail:box, angle:270, angle_not: 200, angle_not_tolerance: 4, angle_not_errmsg: "The Earth pulls the box straight downwards. The ramp does not affect the direction of {label}."},
             'fs_box_ramp' : {tail:box, angle:20},
         }
           

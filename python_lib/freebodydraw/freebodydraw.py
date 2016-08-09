@@ -8,6 +8,7 @@
 import inspect
 import json
 import math
+import urllib
 
 
 ## Built-in check functions
@@ -278,17 +279,19 @@ class Grader(object):
     def _get_points(self, answer):
         return {name: Point(*coords) for name, coords in answer['points'].iteritems()}
 
-def answer_url(original_url, answer):
-    def round_list_inplace(lst, digits=2):
+def answer_url(answer, original_url=""):
+    def round_list(lst, digits=2):
+        lst = list(lst)
         for index, item in enumerate(lst):
-            if isinstance(item, list):
-                round_list_inplace(item)
-            else:
-                lst[index] = round(item, digits)
-    for vec in answer:
-        for key in ['tail', 'coords']:
             try:
-                round_list_inplace(vec[key])
+                lst[index] = round(item, digits)
+            except TypeError:
+                 lst[index] = round_list(item)
+        return lst
+    for vec in answer:
+        for key in ['tail', 'coords', 'comps']:
+            try:
+                vec[key] = round_list(vec[key])
             except KeyError:
                 pass
     query_string = "?answer=" + urllib.quote( json.dumps(answer).replace(' ','') )

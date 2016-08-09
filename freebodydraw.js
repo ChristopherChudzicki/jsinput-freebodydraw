@@ -232,14 +232,21 @@ VectorDraw.prototype.removePoint = function(idx) {
 
 VectorDraw.prototype.getVectorCoordinates = function(vec) {
     var coords = vec.coords;
+    var comps = vec.comps;
     if (!coords) {
         var tail = vec.tail || [0, 0];
-        var length = 'length' in vec ? vec.length : 5;
-        var angle = 'angle' in vec ? vec.angle : 30;
-        var radians = angle * Math.PI / 180;
+        if (!comps) {
+            var length = 'length' in vec ? vec.length : 5;
+            var angle = 'angle' in vec ? vec.angle : 30;
+            var radians = angle * Math.PI / 180;
+            comps = [
+                Math.cos(radians) * length,
+                Math.sin(radians) * length
+            ]
+        }
         var tip = [
-            tail[0] + Math.cos(radians) * length,
-            tail[1] + Math.sin(radians) * length
+            tail[0] + comps[0],
+            tail[1] + comps[1]
         ];
         coords = [tail, tip];
     }
@@ -284,7 +291,7 @@ VectorDraw.prototype.renderVector = function(idx, coords) {
         showInfoBox: false
     });
     var tip = this.board.create('point', coords[1], {
-        name: vec.name,
+        name: style.label || vec.name,
         size: style.pointSize,
         fillColor: style.pointColor,
         strokeColor: style.pointColor,
@@ -431,7 +438,7 @@ VectorDraw.prototype.loadAnswer = function(answer) {
         answerVec.fixed = true;
         
         // find vec from settings.vectors
-        var settingsVecIdx = _.findIndex( vectordraw_settings['vectors'], function(vec){return vec.name === answerVec.name} );
+        var settingsVecIdx = _.findIndex( this.settings['vectors'], function(vec){return vec.name === answerVec.name} );
         var settingsVec = this.settings.vectors[ settingsVecIdx ];
         // delete coordinates so it can be overriden by answerVec
         delete settingsVec.coords
@@ -712,7 +719,6 @@ VectorDraw.prototype.setState = function(state) {
     }, this);
     this.board.update();
 };
-
 
 /////////////////////////////////////////////////////
 var FreeBodyDraw = function(element_id, settings){
@@ -1015,7 +1021,7 @@ FreeBodyDraw.prototype.renderVector = function(idx, coords) {
         showInfoBox: false
     });
     var tip = this.board.create('point', coords[1], {
-        name: vec.name,
+        name: vec.style.label || vec.name,
         size: style.pointSize,
         fillColor: style.pointColor,
         strokeColor: style.pointColor,
