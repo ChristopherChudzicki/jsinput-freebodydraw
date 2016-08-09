@@ -441,7 +441,11 @@ VectorDraw.prototype.loadAnswer = function(answer) {
         var settingsVecIdx = _.findIndex( this.settings['vectors'], function(vec){return vec.name === answerVec.name} );
         var settingsVec = this.settings.vectors[ settingsVecIdx ];
         // delete coordinates so it can be overriden by answerVec
-        delete settingsVec.coords
+        delete settingsVec.coords;
+        
+        // merge answerVec.style into settingsVec.style
+        _.extend(settingsVec.style, answerVec.style );
+        delete answerVec.style;
         
         // update settings.vectors with new settings
         _.extend(settingsVec,answerVec);
