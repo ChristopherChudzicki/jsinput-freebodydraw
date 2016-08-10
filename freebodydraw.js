@@ -750,6 +750,22 @@ var FreeBodyDraw = function(element_id, settings){
 FreeBodyDraw.prototype = Object.create( VectorDraw.prototype );
 FreeBodyDraw.prototype.constructor = FreeBodyDraw;
 
+FreeBodyDraw.prototype.sanitizeSettings = function(settings) {
+    settings = VectorDraw.prototype.sanitizeSettings.call(this,settings);
+
+    var default_vector_extras = {
+        forceType: {long:"", short:""},
+        on: {long:"", short:""},
+        from: {long:"", short:""},
+    }
+
+    settings.vectors.forEach(function(vector) {
+        _.defaults(vector, default_vector_extras);
+    });
+
+    return settings
+}
+
 // modified copy
 FreeBodyDraw.prototype.template = _.template([
     '<div class="header">',
