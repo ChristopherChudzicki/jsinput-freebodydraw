@@ -17,9 +17,9 @@ var VectorDraw = function(element_id, settings) {
 
     this.render();
     
-    var queryString = this.getQueryString();
-    if (queryString.answer != undefined){
-        var answer = JSON.parse(queryString.answer);
+    this.settings.answer = this.settings.answer || this.getQueryString().answer
+    if (this.settings.answer != undefined){
+        var answer = JSON.parse(this.settings.answer);
         this.displayAnswer(answer);
     }
 };

@@ -295,8 +295,8 @@ def encoded_answer(answer):
                 vec[key] = round_list(vec[key])
             except KeyError:
                 pass
-    return answer
+    return urllib.quote( json.dumps(answer).replace(' ','') )
 def answer_url(answer, original_url=""):
     answer = encoded_answer(answer)
-    query_string = "?answer=" + urllib.quote( json.dumps(answer).replace(' ','') )
+    query_string = "?answer=" + answer
     return original_url + query_string
