@@ -279,7 +279,8 @@ class Grader(object):
     def _get_points(self, answer):
         return {name: Point(*coords) for name, coords in answer['points'].iteritems()}
 
-def answer_url(answer, original_url=""):
+def encoded_answer(answer):
+    # Round to two decimal places to help avoid url lenght issues
     def round_list(lst, digits=2):
         lst = list(lst)
         for index, item in enumerate(lst):
@@ -294,5 +295,8 @@ def answer_url(answer, original_url=""):
                 vec[key] = round_list(vec[key])
             except KeyError:
                 pass
+    return answer
+def answer_url(answer, original_url=""):
+    answer = encoded_answer(answer)
     query_string = "?answer=" + urllib.quote( json.dumps(answer).replace(' ','') )
     return original_url + query_string
