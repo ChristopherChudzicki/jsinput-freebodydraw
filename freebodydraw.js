@@ -726,7 +726,10 @@ VectorDraw.prototype.setState = function(state) {
 
 /////////////////////////////////////////////////////
 var FreeBodyDraw = function(element_id, settings){
-    settings.vectors = this.forceVectorsFromDescriptors(settings.forceDescriptors);
+    if (settings.vectors === undefined){
+        settings.vectors = [];
+    }
+    settings.vectors = settings.vectors.concat( this.forceVectorsFromDescriptors(settings.forceDescriptors) );
     settings.snap_angle_increment = 10;
     this.currentActiveVectorIdx = null;
     settings.activeStyle = {
