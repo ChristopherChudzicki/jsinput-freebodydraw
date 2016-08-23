@@ -134,7 +134,8 @@ def _angle_within_tolerance(vec, expected, tolerance):
     x = vec.tip.x - vec.tail.x
     y = vec.tip.y - vec.tail.y
     dot_product = x * math.cos(expected) + y * math.sin(expected)
-    angle = math.degrees(math.acos(dot_product / vec.length))
+    angle_cos = round(dot_product / vec.length, 6) # Occasionally ran into floating point issues where angle_cos would exceed [-1,1] by 10e-16.
+    angle = math.degrees(math.acos( angle_cos ))
     return abs(angle) <= tolerance
 
 def check_angle(check, vectors):
