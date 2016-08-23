@@ -730,7 +730,6 @@ var FreeBodyDraw = function(element_id, settings){
         settings.vectors = [];
     }
     settings.vectors = settings.vectors.concat( this.forceVectorsFromDescriptors(settings.forceDescriptors) );
-    settings.snap_angle_increment = 10;
     this.currentActiveVectorIdx = null;
     settings.activeStyle = {
         lightness: 100,
@@ -751,8 +750,11 @@ FreeBodyDraw.prototype = Object.create( VectorDraw.prototype );
 FreeBodyDraw.prototype.constructor = FreeBodyDraw;
 
 FreeBodyDraw.prototype.sanitizeSettings = function(settings) {
+    var default_settings_extras = {
+        snap_angle_increment:10
+    }
+    settings = _.defaults(settings, default_settings_extras);
     settings = VectorDraw.prototype.sanitizeSettings.call(this,settings);
-
     var default_vector_extras = {
         forceType: {long:"", short:""},
         on: {long:"", short:""},
