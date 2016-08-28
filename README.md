@@ -78,6 +78,7 @@ supports these properties:
 * `axis`: Show the graph axis (defaults to `false`).
 * `show_navigation`: Show navigation arrows and zooom controls (defaults to `false`).
 * `show_vector_properties`: Show the vector properties box (defaults to `true`).
+* `label_from_on`: Display force vector label as `type_from_on` or `type_on_from`. Defaults to `true`.
 
 #### forceDescriptors and vectors
 In Davidson's original [jsinput-vectordraw](https://github.com/open-craft/jsinput-vectordraw) project, problem authors specify a list of `vectors` that the user can draw.
