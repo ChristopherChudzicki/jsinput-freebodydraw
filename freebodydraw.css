@@ -121,6 +121,11 @@ fieldset .row {
     display:table-row;
 }
 
+fieldset legend{
+    text-align:center;
+    font-size:110%;
+}
+
 fieldset h3 {
     margin-top:0px;
     margin-bottom:3px;
@@ -148,18 +153,18 @@ fieldset .warning i {
 }
 
 .menu.highlight-fade .select-wrapper {
-    -webkit-animation: border-fade 1s ease-in-out;
-    animation: border-fade 1s ease-in-out;
+    -webkit-animation: border-fade 1s ease-out;
+    animation: border-fade 1s ease-out;
 }
 
 .menu.highlight-fade .vector-prop-name .value {
-    -webkit-animation: text-fade 1s ease-in-out;
-    animation: text-fade 1s ease-in-out;
+    -webkit-animation: text-fade 1s ease-out;
+    animation: text-fade 1s ease-out;
 }
 
 .vec-label.active.highlight-fade {
-    -webkit-animation: text-fade 1s ease-in-out;
-    animation: text-fade 1s ease-in-out;
+    -webkit-animation: text-fade 1s ease-out;
+    animation: text-fade 1s ease-out;
 }
 
 @keyframes border-fade {

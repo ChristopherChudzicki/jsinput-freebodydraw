@@ -726,10 +726,11 @@ VectorDraw.prototype.setState = function(state) {
 
 /////////////////////////////////////////////////////
 var FreeBodyDraw = function(element_id, settings){
+    settings = _.defaults(settings, {label_from_on:true});
     if (settings.vectors === undefined){
         settings.vectors = [];
     }
-    settings.vectors = settings.vectors.concat( this.forceVectorsFromDescriptors(settings.forceDescriptors) );
+    settings.vectors = settings.vectors.concat( this.forceVectorsFromDescriptors(settings.forceDescriptors, settings.label_from_on) );
     this.currentActiveVectorIdx = null;
     settings.activeStyle = {
         lightness: 100,
@@ -751,7 +752,7 @@ FreeBodyDraw.prototype.constructor = FreeBodyDraw;
 
 FreeBodyDraw.prototype.sanitizeSettings = function(settings) {
     var default_settings_extras = {
-        snap_angle_increment:10
+        snap_angle_increment:10,
     }
     settings = _.defaults(settings, default_settings_extras);
     settings = VectorDraw.prototype.sanitizeSettings.call(this,settings);
@@ -788,6 +789,17 @@ FreeBodyDraw.prototype.template = _.template([
     '       <fieldset>',
     '           <legend>Select a force to draw.</legend>',
     '           <div class="row">',
+    '               <label>type: </label>',
+    '               <span class="select-wrapper">',
+    '               <select id="type">',
+    '                   <option disabled selected>Select...</option>',
+    '                   <% forceDescriptors[0].shortNames.forEach(function(val,idx) { %>',
+    '                   <option value="<%=val%>"> <%= forceDescriptors[0].longNames[idx] %> </option>',
+    '                   <% }) %>',
+    '               </select>',
+    '               <span>',
+    '           </div>',
+    '           <div class="row">',
     '               <label>on: </label>',
     '               <div class="select-wrapper">',
     '               <select id="on">',
@@ -802,7 +814,7 @@ FreeBodyDraw.prototype.template = _.template([
     '               </span>',
     '           </div>',
     '           <div class="row">',
-    '               <label>from: </label>',
+    '               <label>from interaction with: </label>',
     '               <span class="select-wrapper">',
     '               <select id="from">',
     '                   <option disabled selected>Select...</option>',
@@ -814,17 +826,6 @@ FreeBodyDraw.prototype.template = _.template([
     '               <span id="from-warning" class="warning hidden">',
     '                   <i class="fa fa-exclamation-triangle"></i>',
     '               </span>',
-    '           </div>',
-    '           <div class="row">',
-    '               <label>type: </label>',
-    '               <span class="select-wrapper">',
-    '               <select id="type">',
-    '                   <option disabled selected>Select...</option>',
-    '                   <% forceDescriptors[0].shortNames.forEach(function(val,idx) { %>',
-    '                   <option value="<%=val%>"> <%= forceDescriptors[0].longNames[idx] %> </option>',
-    '                   <% }) %>',
-    '               </select>',
-    '               <span>',
     '           </div>',
     '       </fieldset>',
     '   </div>',
@@ -865,7 +866,7 @@ FreeBodyDraw.prototype.template = _.template([
     '</div>',
 ].join('\n'));
 
-FreeBodyDraw.prototype.forceVectorsFromDescriptors = function(descriptors){
+FreeBodyDraw.prototype.forceVectorsFromDescriptors = function(descriptors, label_from_on){
     var type = descriptors[0].shortNames;
     var on = descriptors[1].shortNames;
     var from = descriptors[2].shortNames;
@@ -879,7 +880,11 @@ FreeBodyDraw.prototype.forceVectorsFromDescriptors = function(descriptors){
                     vec.description = vec.name;
                     vec.render = false;
                     vec.style = {color:'navy'};
-                    vec.style.label = "<span>" + type[i] + "<sub>" + on[j] + "," + from[k] + "</sub>" + "</span>";
+                    if (label_from_on){
+                        vec.style.label = "<span>" + type[i] + "<sub>" + from[j] + "," + on[k] + "</sub>" + "</span>";
+                    } else {
+                        vec.style.label = "<span>" + type[i] + "<sub>" + on[j] + "," + from[k] + "</sub>" + "</span>";
+                    }
                     vec.forceType ={};
                     vec.forceType.short = type[i];
                     vec.forceType.long = descriptors[0].longNames[i];
