@@ -881,7 +881,7 @@ FreeBodyDraw.prototype.forceVectorsFromDescriptors = function(descriptors, label
                     vec.render = false;
                     vec.style = {color:'navy'};
                     if (label_from_on){
-                        vec.style.label = "<span>" + type[i] + "<sub>" + from[j] + "," + on[k] + "</sub>" + "</span>";
+                        vec.style.label = "<span>" + type[i] + "<sub>" + from[k] + "," + on[j] + "</sub>" + "</span>";
                     } else {
                         vec.style.label = "<span>" + type[i] + "<sub>" + on[j] + "," + from[k] + "</sub>" + "</span>";
                     }
